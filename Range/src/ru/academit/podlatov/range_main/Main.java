@@ -11,7 +11,7 @@ public class Main {
         System.out.println("Length: " + range.getLength());
         System.out.println("-6 is inside: " + range.isInside(-6));
         System.out.println();
-        System.out.println("Intersection: " + range.getIntersection(range1));
+        System.out.println("Intersection with " + range1 + ": " + range.getIntersection(range1));
         System.out.println();
 
         Range[] rangesUnion = range.getUnion(range1);

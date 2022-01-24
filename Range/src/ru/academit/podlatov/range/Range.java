@@ -6,8 +6,9 @@ public class Range {
 
     public Range(double from, double to) {
         if (from > to) {
-            throw new IllegalArgumentException("\"from\" cannot be greater than \"to\"\n");
+            throw new IllegalArgumentException("\"from\" cannot be greater than \"to\".");
         }
+
         this.from = from;
         this.to = to;
     }
@@ -43,6 +44,7 @@ public class Range {
         if (maxFrom >= minTo) {
             return null;
         }
+
         return new Range(maxFrom, minTo);
     }
 
@@ -56,6 +58,7 @@ public class Range {
         if (maxFrom > minTo) {
             return new Range[]{new Range(minFrom, minTo), new Range(maxFrom, maxTo)};
         }
+
         return new Range[]{new Range(minFrom, maxTo)};
     }
 
@@ -72,17 +75,15 @@ public class Range {
         if (from < range.from && to > range.to) {
             return new Range[]{new Range(from, range.from), new Range(range.to, to)};
         }
-        if ((from <= range.to && from >= range.from) && to > range.to) {
+        if (from <= range.to && from >= range.from) {
             return new Range[]{new Range(range.to, to)};
         }
+
         return new Range[]{new Range(from, range.from)};
     }
 
     @Override
     public String toString() {
-        return "Range{" +
-                "from=" + from +
-                ", to=" + to +
-                '}';
+        return "Range(from= " + from + ", to= " + to + ")";
     }
 }

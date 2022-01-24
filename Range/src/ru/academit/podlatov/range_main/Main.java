@@ -16,7 +16,7 @@ public class Main {
 
         Range[] rangesUnion = range1.getUnion(range2);
         for (Range r : rangesUnion) {
-            System.out.println("Union:" + r);
+            System.out.println("Union: " + r);
         }
         System.out.println();
 

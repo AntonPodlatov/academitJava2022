@@ -1,4 +1,4 @@
-package vector_main;
+package ru.academit.podlatov.vector_main;
 
 import ru.academit.podlatov.vector.Vector;
 

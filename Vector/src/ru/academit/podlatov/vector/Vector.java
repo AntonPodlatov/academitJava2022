@@ -124,15 +124,13 @@ public class Vector {
         Vector maxVector = vector1.getSize() > vector2.getSize() ? vector1 : vector2;
         Vector minVector = vector1.getSize() < vector2.getSize() ? vector1 : vector2;
 
-        double[] array = Arrays.copyOf(minVector.elements,maxVector.getSize());
-
+        double[] array = Arrays.copyOf(minVector.elements, maxVector.getSize());
         for (int i = 0; i < array.length; i++) {
-            array[i] *=  maxVector.elements[i];
+            array[i] *= maxVector.elements[i];
         }
 
         return new Vector(array);
     }
-
 
     @Override
     public String toString() {

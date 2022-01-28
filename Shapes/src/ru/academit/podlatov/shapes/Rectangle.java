@@ -1,25 +1,26 @@
 package ru.academit.podlatov.shapes;
 
-import ru.academit.podlatov.shapeInterface.Shape;
+import ru.academit.podlatov.shapes.comparison_functions.CheckIfDoublesIsEqual;
+import ru.academit.podlatov.shapes.comparison_functions.CheckIfNumberIsPositive;
 
 public class Rectangle implements Shape {
     private double height;
     private double width;
 
     public Rectangle(double height, double width) {
-        checkIfANumberIsGreaterThanZero(height);
-        checkIfANumberIsGreaterThanZero(width);
+        CheckIfNumberIsPositive.check(height);
+        CheckIfNumberIsPositive.check(width);
         this.height = height;
         this.width = width;
     }
 
     public void setHeight(double height) {
-        checkIfANumberIsGreaterThanZero(height);
+        CheckIfNumberIsPositive.check(height);
         this.height = height;
     }
 
     public void setWidth(double width) {
-        checkIfANumberIsGreaterThanZero(width);
+        CheckIfNumberIsPositive.check(width);
         this.width = width;
     }
 
@@ -38,16 +39,9 @@ public class Rectangle implements Shape {
         return height * width;
     }
 
-    private void checkIfANumberIsGreaterThanZero(double number) {
-        final double epsilon = 1.0e-10;
-        if (number < -epsilon) {
-            throw new IllegalArgumentException("The figure dimension cannot be less than or equal to zero.");
-        }
-    }
-
     @Override
     public double getPerimeter() {
-        int dimensionsCount = 2;
+        final int dimensionsCount = 2;
         return (height * dimensionsCount) + (width * dimensionsCount);
     }
 
@@ -58,15 +52,21 @@ public class Rectangle implements Shape {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         Rectangle rectangle = (Rectangle) o;
-        return Double.compare(rectangle.height, height) == 0 && Double.compare(rectangle.width, width) == 0;
+        return CheckIfDoublesIsEqual.isEqual(rectangle.height, height)
+                && CheckIfDoublesIsEqual.isEqual(rectangle.width, width);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 27;
+        final int prime = 23;
         int hash = 1;
         hash = prime * hash + Double.hashCode(height);
         hash = prime * hash + Double.hashCode(width);

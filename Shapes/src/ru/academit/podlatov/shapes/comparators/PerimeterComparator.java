@@ -1,6 +1,6 @@
-package ru.academit.podlatov.shapeComparators;
+package ru.academit.podlatov.shapes.comparators;
 
-import ru.academit.podlatov.shapeInterface.Shape;
+import ru.academit.podlatov.shapes.Shape;
 
 import java.util.Comparator;
 

@@ -1,12 +1,13 @@
 package ru.academit.podlatov.shapes;
 
-import ru.academit.podlatov.shapeInterface.Shape;
+import ru.academit.podlatov.shapes.comparison_functions.CheckIfDoublesIsEqual;
+import ru.academit.podlatov.shapes.comparison_functions.CheckIfNumberIsPositive;
 
 public class Circle implements Shape {
     private double radius;
 
     public Circle(double radius) {
-        checkIfANumberIsGreaterThanZero(radius);
+        CheckIfNumberIsPositive.check(radius);
         this.radius = radius;
     }
 
@@ -15,15 +16,8 @@ public class Circle implements Shape {
     }
 
     public void setRadius(double radius) {
-        checkIfANumberIsGreaterThanZero(radius);
+        CheckIfNumberIsPositive.check(radius);
         this.radius = radius;
-    }
-
-    private void checkIfANumberIsGreaterThanZero(double number) {
-        final double epsilon = 1.0e-10;
-        if (number < -epsilon) {
-            throw new IllegalArgumentException("The figure dimension cannot be less than or equal to zero.");
-        }
     }
 
     @Override
@@ -53,16 +47,20 @@ public class Circle implements Shape {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Circle circle = (Circle) o;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        return Double.compare(circle.radius, radius) == 0;
+        Circle circle = (Circle) o;
+        return CheckIfDoublesIsEqual.isEqual(radius, circle.radius);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 33;
+        final int prime = 13;
         int hash = 1;
         hash = prime * hash + Double.hashCode(radius);
 

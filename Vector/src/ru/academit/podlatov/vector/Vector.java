@@ -7,7 +7,7 @@ public class Vector {
 
     public Vector(int size) {
         if (size <= 0) {
-            throw new IllegalArgumentException("Vector size must be >0");
+            throw new IllegalArgumentException("size=" + size + ". Vector size must be > 0");
         }
 
         elements = new double[size];
@@ -25,23 +25,12 @@ public class Vector {
         elements = Arrays.copyOf(array, array.length);
     }
 
-    public Vector(double[] array, int addedElementsCount) {
-        if (array.length == 0) {
-            throw new IllegalArgumentException("Array is empty");
-        } else if (addedElementsCount <= 0) {
-            throw new IllegalArgumentException("Vector size must be >0");
+    public Vector(double[] array, int size) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("size=" + size + ". Vector size must be > 0");
         }
-
-        if (array.length > addedElementsCount) {
-            elements = Arrays.copyOf(array, addedElementsCount);
-        }
-        if (array.length == addedElementsCount) {
-            elements = Arrays.copyOf(array, array.length);
-        }
-        if (array.length < addedElementsCount) {
-            elements = new double[addedElementsCount];
-            System.arraycopy(array, 0, elements, 0, array.length);
-        }
+        
+        elements = Arrays.copyOf(array, size);
     }
 
     public int getSize() {
@@ -70,19 +59,17 @@ public class Vector {
 
     public void multiplyByScalar(double scalar) {
         for (int i = 0; i < elements.length; i++) {
-            elements[i] = elements[i] * scalar;
+            elements[i] *= scalar;
         }
     }
 
     public void revert() {
-        int vectorReversalFactor = -1;
-        for (int i = 0; i < elements.length; i++) {
-            elements[i] *= vectorReversalFactor;
-        }
+        multiplyByScalar(-1);
     }
 
-    public double getVectorLength() {
+    public double getLength() {
         double sumOfSquares = 0;
+
         for (double element : elements) {
             sumOfSquares += element * element;
         }
@@ -90,57 +77,75 @@ public class Vector {
         return Math.sqrt(sumOfSquares);
     }
 
-    public double getVectorElement(int index) {
+    public double getElement(int index) {
         if (index < 0 || index >= elements.length) {
-            throw new IllegalArgumentException("Wrong index.");
+            throw new IndexOutOfBoundsException("index=" + index + ". Valid range={" + 0 + ";" + (elements.length - 1) + "}");
         }
 
         return elements[index];
     }
 
-    public void setVectorElement(double element, int index) {
+    public void setElement(int index, double element) {
         if (index < 0 || index >= elements.length) {
-            throw new IllegalArgumentException("Wrong index.");
+            throw new IndexOutOfBoundsException("index=" + index + ". Valid range={" + 0 + ";" + (elements.length - 1) + "}");
         }
 
         elements[index] = element;
     }
 
-    public static Vector getVectorsSum(Vector vector1, Vector vector2) {
+    public static Vector getSum(Vector vector1, Vector vector2) {
         Vector result = new Vector(vector1);
         result.add(vector2);
 
         return result;
     }
 
-    public static Vector getResidualVector(Vector minuend, Vector subtracted) {
+    public static Vector getDifference(Vector minuend, Vector subtracted) {
         Vector result = new Vector(minuend);
         result.subtract(subtracted);
 
         return result;
     }
 
-    public static Vector getScalarProductOfVectors(Vector vector1, Vector vector2) {
+    public static double getScalarProduct(Vector vector1, Vector vector2) {
         Vector maxVector = vector1.getSize() > vector2.getSize() ? vector1 : vector2;
         Vector minVector = vector1.getSize() < vector2.getSize() ? vector1 : vector2;
 
         double[] array = Arrays.copyOf(minVector.elements, maxVector.getSize());
+        double result = 0;
         for (int i = 0; i < array.length; i++) {
-            array[i] *= maxVector.elements[i];
+            result += array[i] * maxVector.elements[i];
         }
 
-        return new Vector(array);
+        return result;
     }
 
     @Override
     public String toString() {
-        return "Vector" + Arrays.toString(elements);
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("{");
+
+        for (int i = 0; i < elements.length; i++) {
+            stringBuilder.append(elements[i]);
+            if (i < elements.length - 1) {
+                stringBuilder.append(", ");
+            }
+        }
+        stringBuilder.append("}");
+
+        return stringBuilder.toString();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         Vector vector = (Vector) o;
 
         return Arrays.equals(elements, vector.elements);
@@ -148,10 +153,11 @@ public class Vector {
 
     @Override
     public int hashCode() {
-        final int prime = 34;
+        final int prime = 43;
         int hash = 1;
-        for (double d : elements) {
-            hash = hash * prime + Double.hashCode(d);
+
+        for (double e : elements) {
+            hash = hash * prime + Double.hashCode(e);
         }
 
         return hash;

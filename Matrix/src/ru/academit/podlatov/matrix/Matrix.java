@@ -221,7 +221,7 @@ public class Matrix {
         return residualMatrix;
     }
 
-    public static Matrix getSumMatrix(Matrix matrix1, Matrix matrix2) {
+    public static Matrix getSum(Matrix matrix1, Matrix matrix2) {
         Matrix sum = new Matrix(matrix1);
         sum.addMatrix(matrix2);
 

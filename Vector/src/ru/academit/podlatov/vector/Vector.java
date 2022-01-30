@@ -29,8 +29,12 @@ public class Vector {
         if (size <= 0) {
             throw new IllegalArgumentException("size=" + size + ". Vector size must be > 0");
         }
-        
+
         elements = Arrays.copyOf(array, size);
+    }
+
+    public double[] getElements() {
+        return elements;
     }
 
     public int getSize() {

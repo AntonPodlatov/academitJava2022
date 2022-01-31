@@ -9,23 +9,23 @@ import java.util.Arrays;
 public class ShapeFunctions {
     public static Shape getMaxAreaShape(Shape[] shapes) {
         if (shapes.length == 0) {
-            throw new IllegalArgumentException("Array is empty");
+            throw new IllegalArgumentException("Array is empty.");
         }
 
-        final int maxAreaFigureIndexCoefficient = 1;
+        final int maxAreaShapeIndex = 1;
         Arrays.sort(shapes, new AreaComparator());
 
-        return shapes[shapes.length - maxAreaFigureIndexCoefficient];
+        return shapes[shapes.length - maxAreaShapeIndex];
     }
 
     public static Shape getSecondPerimeterShape(Shape[] shapes) {
-        if (shapes.length == 0) {
-            throw new IllegalArgumentException("Array is empty");
+        if (shapes.length < 2) {
+            throw new IllegalArgumentException("Array length = " + shapes.length + ", cant be < 2.");
         }
 
-        final int secondPerimeterFigureCoefficient = 2;
+        final int secondPerimeterIndex = 2;
         Arrays.sort(shapes, new PerimeterComparator());
 
-        return shapes[shapes.length - secondPerimeterFigureCoefficient];
+        return shapes[shapes.length - secondPerimeterIndex];
     }
 }

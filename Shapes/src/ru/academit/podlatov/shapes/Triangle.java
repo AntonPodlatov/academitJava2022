@@ -1,7 +1,5 @@
 package ru.academit.podlatov.shapes;
 
-import ru.academit.podlatov.shapes.comparison_functions.CheckIfDoublesIsEqual;
-
 public class Triangle implements Shape {
     private double x1;
     private double y1;
@@ -103,9 +101,9 @@ public class Triangle implements Shape {
     @Override
     public String toString() {
         return "Triangle (" +
-                "(" + x1 + " ; " + y1 + ")" +
-                ", (" + x2 + " ; " + y2 + ")" +
-                ", (" + x3 + " ; " + y3 + ")" +
+                "(" + x1 + "; " + y1 + ")" +
+                ", (" + x2 + "; " + y2 + ")" +
+                ", (" + x3 + "; " + y3 + ")" +
                 ")";
     }
 
@@ -119,18 +117,19 @@ public class Triangle implements Shape {
         }
 
         Triangle triangle = (Triangle) o;
-        return CheckIfDoublesIsEqual.isEqual(triangle.x1, x1)
-                && CheckIfDoublesIsEqual.isEqual(triangle.y1, y1)
-                && CheckIfDoublesIsEqual.isEqual(triangle.x2, x2)
-                && CheckIfDoublesIsEqual.isEqual(triangle.y2, y2)
-                && CheckIfDoublesIsEqual.isEqual(triangle.x3, x3)
-                && CheckIfDoublesIsEqual.isEqual(triangle.y3, y3);
+        return triangle.x1== x1
+                && triangle.y1== y1
+                && triangle.x2== x2
+                && triangle.y2== y2
+                && triangle.x3== x3
+                && triangle.y3== y3;
     }
 
     @Override
     public int hashCode() {
         final int prime = 89;
         int hash = 1;
+
         hash = prime * hash + Double.hashCode(x1);
         hash = prime * hash + Double.hashCode(x2);
         hash = prime * hash + Double.hashCode(x3);

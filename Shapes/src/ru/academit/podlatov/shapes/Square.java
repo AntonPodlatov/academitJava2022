@@ -1,13 +1,12 @@
 package ru.academit.podlatov.shapes;
 
-import ru.academit.podlatov.shapes.comparison_functions.CheckIfDoublesIsEqual;
-import ru.academit.podlatov.shapes.comparison_functions.CheckIfNumberIsPositive;
+import ru.academit.podlatov.shapes.comparison_functions.PositivityChecker;
 
 public class Square implements Shape {
     private double sideLength;
 
     public Square(double sideLength) {
-        CheckIfNumberIsPositive.check(sideLength);
+        PositivityChecker.check(sideLength);
         this.sideLength = sideLength;
     }
 
@@ -16,7 +15,7 @@ public class Square implements Shape {
     }
 
     public void setSideLength(double sideLength) {
-        CheckIfNumberIsPositive.check(sideLength);
+        PositivityChecker.check(sideLength);
         this.sideLength = sideLength;
     }
 
@@ -43,7 +42,7 @@ public class Square implements Shape {
 
     @Override
     public String toString() {
-        return "Square (sideLength= " + sideLength + ")";
+        return "Square (sideLength = " + sideLength + ")";
     }
 
     @Override
@@ -56,14 +55,16 @@ public class Square implements Shape {
         }
 
         Square square = (Square) o;
-        return CheckIfDoublesIsEqual.isEqual(square.sideLength, sideLength);
+        return square.sideLength == sideLength;
     }
 
     @Override
     public int hashCode() {
         final int prime = 17;
         int hash = 1;
+
         hash = hash * prime + Double.hashCode(sideLength);
+
         return hash;
     }
 }

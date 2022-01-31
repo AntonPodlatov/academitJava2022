@@ -7,7 +7,7 @@ public class Vector {
 
     public Vector(int size) {
         if (size <= 0) {
-            throw new IllegalArgumentException("size=" + size + ". Vector size must be > 0");
+            throw new IllegalArgumentException("Size = " + size + ". Vector size must be > 0.");
         }
 
         elements = new double[size];
@@ -19,7 +19,7 @@ public class Vector {
 
     public Vector(double[] array) {
         if (array.length == 0) {
-            throw new IllegalArgumentException("Array is empty");
+            throw new IllegalArgumentException("Array is empty.");
         }
 
         elements = Arrays.copyOf(array, array.length);
@@ -27,14 +27,10 @@ public class Vector {
 
     public Vector(double[] array, int size) {
         if (size <= 0) {
-            throw new IllegalArgumentException("size=" + size + ". Vector size must be > 0");
+            throw new IllegalArgumentException("Size = " + size + ". Vector size must be > 0.");
         }
 
         elements = Arrays.copyOf(array, size);
-    }
-
-    public double[] getElements() {
-        return elements;
     }
 
     public int getSize() {
@@ -72,18 +68,18 @@ public class Vector {
     }
 
     public double getLength() {
-        double sumOfSquares = 0;
+        double squaresSum = 0;
 
         for (double element : elements) {
-            sumOfSquares += element * element;
+            squaresSum += element * element;
         }
 
-        return Math.sqrt(sumOfSquares);
+        return Math.sqrt(squaresSum);
     }
 
     public double getElement(int index) {
         if (index < 0 || index >= elements.length) {
-            throw new IndexOutOfBoundsException("index=" + index + ". Valid range={" + 0 + ";" + (elements.length - 1) + "}");
+            throw new IndexOutOfBoundsException("Index = " + index + ". Valid range = {0; " + (elements.length - 1) + "}");
         }
 
         return elements[index];
@@ -91,7 +87,7 @@ public class Vector {
 
     public void setElement(int index, double element) {
         if (index < 0 || index >= elements.length) {
-            throw new IndexOutOfBoundsException("index=" + index + ". Valid range={" + 0 + ";" + (elements.length - 1) + "}");
+            throw new IndexOutOfBoundsException("Index = " + index + ". Valid range = {0; " + (elements.length - 1) + "}");
         }
 
         elements[index] = element;
@@ -112,13 +108,11 @@ public class Vector {
     }
 
     public static double getScalarProduct(Vector vector1, Vector vector2) {
-        Vector maxVector = vector1.getSize() > vector2.getSize() ? vector1 : vector2;
-        Vector minVector = vector1.getSize() < vector2.getSize() ? vector1 : vector2;
-
-        double[] array = Arrays.copyOf(minVector.elements, maxVector.getSize());
         double result = 0;
-        for (int i = 0; i < array.length; i++) {
-            result += array[i] * maxVector.elements[i];
+        int minVectorSize = Math.min(vector1.getSize(), vector2.getSize());
+
+        for (int i = 0; i < minVectorSize; i++) {
+            result += vector1.elements[i] * vector2.elements[i];
         }
 
         return result;
@@ -130,12 +124,11 @@ public class Vector {
 
         stringBuilder.append("{");
 
-        for (int i = 0; i < elements.length; i++) {
-            stringBuilder.append(elements[i]);
-            if (i < elements.length - 1) {
-                stringBuilder.append(", ");
-            }
+        for (double element : elements) {
+            stringBuilder.append(element).append(", ");
         }
+
+        stringBuilder.deleteCharAt(elements.length - 1);
         stringBuilder.append("}");
 
         return stringBuilder.toString();
@@ -157,13 +150,7 @@ public class Vector {
 
     @Override
     public int hashCode() {
-        final int prime = 43;
-        int hash = 1;
 
-        for (double e : elements) {
-            hash = hash * prime + Double.hashCode(e);
-        }
-
-        return hash;
+        return Arrays.hashCode(elements);
     }
 }

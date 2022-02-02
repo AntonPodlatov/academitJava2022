@@ -18,7 +18,6 @@ public class Rectangle implements Shape {
         return height;
     }
 
-
     public void setHeight(double height) {
         PositivityChecker.check(height);
         this.height = height;
@@ -47,7 +46,7 @@ public class Rectangle implements Shape {
 
     @Override
     public String toString() {
-        return "Rectangle (height = " + height + " , width = " + width + ")";
+        return "Rectangle (height = " + height + " ,width = " + width + ")";
     }
 
     @Override

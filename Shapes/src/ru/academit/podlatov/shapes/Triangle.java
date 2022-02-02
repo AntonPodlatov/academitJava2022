@@ -68,7 +68,7 @@ public class Triangle implements Shape {
     }
 
     private static double getSegmentLength(double x1, double y1, double x2, double y2) {
-        return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
     @Override
@@ -93,18 +93,12 @@ public class Triangle implements Shape {
 
     @Override
     public double getPerimeter() {
-        return getSegmentLength(x1, y1, x2, y2)
-                + getSegmentLength(x2, y2, x3, y3)
-                + getSegmentLength(x1, y1, x3, y3);
+        return getSegmentLength(x1, y1, x2, y2) + getSegmentLength(x2, y2, x3, y3) + getSegmentLength(x1, y1, x3, y3);
     }
 
     @Override
     public String toString() {
-        return "Triangle (" +
-                "(" + x1 + "; " + y1 + ")" +
-                ", (" + x2 + "; " + y2 + ")" +
-                ", (" + x3 + "; " + y3 + ")" +
-                ")";
+        return "Triangle (" + "(" + x1 + "; " + y1 + ")" + ", (" + x2 + "; " + y2 + ")" + ", (" + x3 + "; " + y3 + ")" + ")";
     }
 
     @Override
@@ -117,12 +111,7 @@ public class Triangle implements Shape {
         }
 
         Triangle triangle = (Triangle) o;
-        return triangle.x1== x1
-                && triangle.y1== y1
-                && triangle.x2== x2
-                && triangle.y2== y2
-                && triangle.x3== x3
-                && triangle.y3== y3;
+        return triangle.x1 == x1 && triangle.y1 == y1 && triangle.x2 == x2 && triangle.y2 == y2 && triangle.x3 == x3 && triangle.y3 == y3;
     }
 
     @Override

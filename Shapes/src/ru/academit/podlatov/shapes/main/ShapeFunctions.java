@@ -12,10 +12,10 @@ public class ShapeFunctions {
             throw new IllegalArgumentException("Array is empty.");
         }
 
-        final int maxAreaShapeIndex = 1;
+        final int maxAreaShapeIndexOffset = 1;
         Arrays.sort(shapes, new AreaComparator());
 
-        return shapes[shapes.length - maxAreaShapeIndex];
+        return shapes[shapes.length - maxAreaShapeIndexOffset];
     }
 
     public static Shape getSecondPerimeterShape(Shape[] shapes) {
@@ -23,9 +23,9 @@ public class ShapeFunctions {
             throw new IllegalArgumentException("Array length = " + shapes.length + ", cant be < 2.");
         }
 
-        final int secondPerimeterIndex = 2;
+        final int secondPerimeterShapeIndexOffset = 2;
         Arrays.sort(shapes, new PerimeterComparator());
 
-        return shapes[shapes.length - secondPerimeterIndex];
+        return shapes[shapes.length - secondPerimeterShapeIndexOffset];
     }
 }

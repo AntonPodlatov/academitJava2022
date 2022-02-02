@@ -129,6 +129,7 @@ public class Vector {
         }
 
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
         stringBuilder.append("}");
 
         return stringBuilder.toString();
@@ -150,7 +151,6 @@ public class Vector {
 
     @Override
     public int hashCode() {
-
         return Arrays.hashCode(elements);
     }
 }

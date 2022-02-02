@@ -16,8 +16,8 @@ public class Main {
         Vector sum = Vector.getSum(vector1, vector2);
         System.out.println("vectors sum: " + sum);
 
-        Vector residue = Vector.getDifference(vector2, vector1);
-        System.out.println("vector2 and vector1 difference: " + residue);
+        Vector difference = Vector.getDifference(vector2, vector1);
+        System.out.println("vector2 and vector1 difference: " + difference);
 
         double scalarProduct = Vector.getScalarProduct(vector2, vector1);
         System.out.println("vectors scalar product: " + scalarProduct);

@@ -262,7 +262,7 @@ public class Matrix {
 
     public static Matrix getProduct(Matrix matrix1, Matrix matrix2) {
         if (matrix1.getColumnsCount() != matrix2.getRowsCount()) {
-            throw new IllegalArgumentException("Matrix1 columns count = " + matrix1.getColumnsCount() + "matrix2 rows count = " + matrix2.getRowsCount() + ". The matrices are inconsistent.");
+            throw new IllegalArgumentException("Matrix1 columns count = " + matrix1.getColumnsCount() + ", matrix2 rows count = " + matrix2.getRowsCount() + ". The matrices are inconsistent.");
         }
 
         Matrix result = new Matrix(matrix1.getRowsCount(), matrix2.getColumnsCount());
@@ -288,8 +288,7 @@ public class Matrix {
             stringBuilder.append(v).append(", ");
         }
 
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
         stringBuilder.append("}");
 
         return stringBuilder.toString();

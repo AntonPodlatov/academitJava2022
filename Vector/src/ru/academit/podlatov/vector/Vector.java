@@ -128,8 +128,7 @@ public class Vector {
             stringBuilder.append(element).append(", ");
         }
 
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
         stringBuilder.append("}");
 
         return stringBuilder.toString();

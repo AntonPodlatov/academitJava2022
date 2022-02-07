@@ -20,6 +20,7 @@ public class ArrayListHome {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+
         return lines;
     }
 
@@ -40,6 +41,7 @@ public class ArrayListHome {
                 uniqueNumbersList.add(integerNumber);
             }
         }
+
         return uniqueNumbersList;
     }
 

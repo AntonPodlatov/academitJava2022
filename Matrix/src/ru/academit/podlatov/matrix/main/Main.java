@@ -20,6 +20,6 @@ public class Main {
         System.out.println();
 
         Matrix sum = Matrix.getSum(matrix2, matrix3);
-        System.out.println("matrix2 and matrix3 sum " + sum);
+        System.out.println("matrix2 and matrix3 sum: " + sum);
     }
 }

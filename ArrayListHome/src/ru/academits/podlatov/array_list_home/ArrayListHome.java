@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ArrayListHome {
-    public static ArrayList<String> getStringsListFromFile(String inputLocation) {
+    public static ArrayList<String> getStringsListFromFile(String inputFilePath) {
         ArrayList<String> lines = new ArrayList<>();
 
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(inputLocation))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(inputFilePath))) {
             String line;
 
             while ((line = bufferedReader.readLine()) != null) {
@@ -24,21 +24,21 @@ public class ArrayListHome {
         return lines;
     }
 
-    public static void removeEvenNumbersFromList(ArrayList<Integer> integers) {
-        for (int i = 0; i < integers.size(); i++) {
-            if (integers.get(i) % 2 == 0) {
-                integers.remove(i);
+    public static void removeEvenNumbers(ArrayList<Integer> numbers) {
+        for (int i = 0; i < numbers.size(); i++) {
+            if (numbers.get(i) % 2 == 0) {
+                numbers.remove(i);
                 i--;
             }
         }
     }
 
-    private static ArrayList<Integer> getListWithoutDuplicates(ArrayList<Integer> listWithDuplicates) {
-        ArrayList<Integer> uniqueNumbersList = new ArrayList<>(listWithDuplicates.size());
+    private static ArrayList<Integer> getListWithoutDuplicates(ArrayList<Integer> notUniqueNumbersList) {
+        ArrayList<Integer> uniqueNumbersList = new ArrayList<>(notUniqueNumbersList.size());
 
-        for (Integer integerNumber : listWithDuplicates) {
-            if (!uniqueNumbersList.contains(integerNumber)) {
-                uniqueNumbersList.add(integerNumber);
+        for (Integer number : notUniqueNumbersList) {
+            if (!uniqueNumbersList.contains(number)) {
+                uniqueNumbersList.add(number);
             }
         }
 
@@ -52,7 +52,7 @@ public class ArrayListHome {
 
         ArrayList<Integer> listWithEvenNumbers = new ArrayList<>(Arrays.asList(1, 3, 6, 8, 3, 5, 2, 0, 7, 8, 9, 4, -1));
         System.out.println("listWithEvenNumbers: " + listWithEvenNumbers);
-        removeEvenNumbersFromList(listWithEvenNumbers);
+        removeEvenNumbers(listWithEvenNumbers);
         System.out.println("listWithEvenNumbers without even numbers: " + listWithEvenNumbers);
         System.out.println();
 

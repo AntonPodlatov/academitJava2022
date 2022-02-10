@@ -16,7 +16,6 @@ public class ArrayListHome {
             while ((line = bufferedReader.readLine()) != null) {
                 lines.add(line);
             }
-
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }

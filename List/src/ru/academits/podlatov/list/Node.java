@@ -1,31 +1,31 @@
-package ru.academits.podlatov.list.node;
+package ru.academits.podlatov.list;
 
-public class Node<T> {
+class Node<T> {
     private Node<T> next;
     private T data;
 
-    public Node(Node<T> next, T data) {
+    protected Node(Node<T> next, T data) {
         this.next = next;
         this.data = data;
     }
 
-    public Node(T data){
+    protected Node(T data) {
         this.data = data;
     }
 
-    public Node<T> getNext() {
+    protected Node<T> getNext() {
         return next;
     }
 
-    public void setNext(Node<T> next) {
+    protected void setNext(Node<T> next) {
         this.next = next;
     }
 
-    public T getData() {
+    protected T get() {
         return data;
     }
 
-    public void setData(T data) {
+    protected void set(T data) {
         this.data = data;
     }
 }

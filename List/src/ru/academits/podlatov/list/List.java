@@ -1,7 +1,5 @@
 package ru.academits.podlatov.list;
 
-import ru.academits.podlatov.list.node.Node;
-
 import java.util.NoSuchElementException;
 
 public class List<T> {
@@ -12,27 +10,14 @@ public class List<T> {
         return size;
     }
 
-    public T getHeadsData() {
-        checkIfEmpty();
+    public T getFirst() {
+        checkEmpty();
 
-        return head.getData();
-    }
-
-    private void checkIfEmpty() {
-        if (head == null) {
-            throw new NoSuchElementException("List is empty.");
-        }
-    }
-
-    private void checkIndex(int index) {
-        if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException("Index = " + index + ". valid range: [0, " + (size - 1) + "]");
-        }
+        return head.get();
     }
 
     private Node<T> getNode(int index) {
         checkIndex(index);
-        checkIfEmpty();
 
         Node<T> node = head;
 
@@ -45,45 +30,67 @@ public class List<T> {
         return node;
     }
 
-    public T getData(int index) {
-        return getNode(index).getData();
+    public T get(int index) {
+        return getNode(index).get();
     }
 
-    public T setData(int index, T data) {
+    public T set(int index, T data) {
         Node<T> node = getNode(index);
-        T oldData = node.getData();
-        node.setData(data);
+        T oldData = node.get();
+        node.set(data);
 
         return oldData;
     }
 
-    public T removeNode(int index) {
-        checkIfEmpty();
+    private T removeFirst() {
+        checkEmpty();
+
+        T removedData = head.get();
+        head = head.getNext();
+        size--;
+        return removedData;
+    }
+
+    public T removeByIndex(int index) {
         checkIndex(index);
 
         if (index == 0) {
-            return removeHead();
+            return removeFirst();
         }
 
         Node<T> previous = getNode(index - 1);
-        T oldData = getNode(index).getData();
+        T removedData = getNode(index).get();
         previous.setNext(getNode(index).getNext());
 
         size--;
 
-        return oldData;
+        return removedData;
     }
 
-    private T removeHead() {
-        checkIfEmpty();
+    public boolean removeByData(T data) {
+        Node<T> current = head;
+        Node<T> previous = null;
 
-        T oldData = head.getData();
-        head = head.getNext();
-        size--;
-        return oldData;
+        while (current != null) {
+            if (data == current.get() || current.get().equals(data)) {
+                if (previous != null) {
+                    previous.setNext(current.getNext());
+                } else {
+                    head = current.getNext();
+                }
+
+                size--;
+                return true;
+            }
+
+            previous = current;
+            current = current.getNext();
+        }
+
+        return false;
     }
 
-    public void insertAtBeginning(T data) {
+    public void insertFirst(T data) {
         head = new Node<>(head, data);
         size++;
     }
@@ -92,40 +99,18 @@ public class List<T> {
         checkIndex(index);
 
         if (index == 0) {
-            insertAtBeginning(data);
+            insertFirst(data);
         }
 
-        Node<T> prev = getNode(index - 1);
-        prev.setNext(new Node<>(prev.getNext(), data));
+        Node<T> previous = getNode(index - 1);
+        previous.setNext(new Node<>(previous.getNext(), data));
         size++;
     }
 
-    public boolean removeNodeByData(T data) {
-        Node<T> node = head;
-        Node<T> prevNode = null;
-
-        while (node != null) {
-            if (data.equals(node.getData())) {
-                if (prevNode != null) {
-                    prevNode.setNext(node.getNext());
-                } else {
-                    head = node.getNext();
-                }
-                size--;
-
-                return true;
-            }
-            prevNode = node;
-            node = node.getNext();
-        }
-
-        return false;
-    }
-
     public void revert() {
-        checkIfEmpty();
-
-        if (size == 1) {
+        if (head == null) {
+            return;
+        } else if (size == 1) {
             return;
         }
 
@@ -145,37 +130,51 @@ public class List<T> {
     }
 
     public List<T> copy() {
-        checkIfEmpty();
+        checkEmpty();
 
         List<T> listCopy = new List<>();
-        listCopy.head = new Node<>(head.getData());
+        listCopy.head = new Node<>(head.get());
         listCopy.size = size;
 
         for (Node<T> node = head.getNext(), nodeCopy = listCopy.head; node != null;
              node = node.getNext()) {
 
-            nodeCopy.setNext(new Node<>(node.getData()));
+            nodeCopy.setNext(new Node<>(node.get()));
             nodeCopy = nodeCopy.getNext();
         }
         return listCopy;
     }
 
+    private void checkEmpty() {
+        if (head == null) {
+            throw new NoSuchElementException("List is empty.");
+        }
+    }
+
+    private void checkIndex(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index = " + index + ". valid range: [0, " + (size - 1) + "]");
+        }
+    }
+
     @Override
     public String toString() {
-        checkIfEmpty();
+        if (head == null) {
+            return "[]";
+        }
 
-        StringBuilder stringBuilder = new StringBuilder("{");
+        StringBuilder stringBuilder = new StringBuilder("[");
 
         Node<T> node = head;
 
         while (node.getNext() != null) {
-            stringBuilder.append(node.getData());
+            stringBuilder.append(node.get());
             stringBuilder.append(", ");
             node = node.getNext();
         }
 
-        stringBuilder.append(node.getData());
-        stringBuilder.append("}");
+        stringBuilder.append(node.get());
+        stringBuilder.append("]");
 
         return stringBuilder.toString();
     }

@@ -6,21 +6,26 @@ public class Main {
     public static void main(String[] args) {
         List<Character> charList = new List<>();
 
-        charList.insertAtBeginning('d');
-        charList.insertAtBeginning('c');
-        charList.insertAtBeginning('b');
-        charList.insertAtBeginning('a');
+        charList.insertFirst('d');
+        charList.insertFirst('c');
+        charList.insertFirst('b');
+        charList.insertFirst('a');
+        charList.insertFirst(null);
 
         System.out.println("charList: " + charList);
 
         charList.revert();
+        charList.removeByData(null);
 
-        System.out.println("reverted charList: " + charList);
-        System.out.println("Second element: " + charList.getData(1));
+        System.out.println("reverted charList without null: " + charList);
+        System.out.println("Second element: " + charList.get(1));
 
-        boolean isDeleted = charList.removeNodeByData('c');
+        boolean isDeleted = charList.removeByData('c');
         System.out.println("CharList without 'c' element: " + charList);
-        System.out.println("Second element: " + charList.getData(1));
+        System.out.println("Second element: " + charList.get(1));
 
+        List<Integer> emptyList = new List<>();
+        emptyList.revert();
+        System.out.println("EmptyList: " + emptyList);
     }
 }

@@ -7,10 +7,10 @@ public class Matrix {
 
     public Matrix(int rowsCount, int columnsCount) {
         if (rowsCount <= 0) {
-            throw new IllegalArgumentException("RowsCount = " + rowsCount + ". Matrix rowsCount cant be <= 0.");
+            throw new IllegalArgumentException("RowsCount = " + rowsCount + ". Matrix rowsCount can't be <= 0.");
         }
         if (columnsCount <= 0) {
-            throw new IllegalArgumentException("ColumnsCount = " + columnsCount + ". Matrix columnsCount cant be <= 0.");
+            throw new IllegalArgumentException("ColumnsCount = " + columnsCount + ". Matrix columnsCount can't be <= 0.");
         }
 
         rows = new Vector[rowsCount];
@@ -30,7 +30,7 @@ public class Matrix {
 
     public Matrix(double[][] array) {
         if (array.length == 0) {
-            throw new IllegalArgumentException("Array length = " + array.length + ". Matrix rows count cant be < 1.");
+            throw new IllegalArgumentException("Array length = " + array.length + ". Matrix rows count can't be < 1.");
         }
 
         int maxArraySize = 0;
@@ -42,7 +42,7 @@ public class Matrix {
         }
 
         if (maxArraySize == 0) {
-            throw new IllegalArgumentException("Second level array length = " + array[0].length + ". Matrix columns count cant be < 1.");
+            throw new IllegalArgumentException("Second level array length = " + array[0].length + ". Matrix columns count can't be < 1.");
         }
 
         rows = new Vector[array.length];
@@ -108,8 +108,11 @@ public class Matrix {
     }
 
     public Vector getColumn(int index) {
-        if (index < 0 || index >= rows.length) {
-            throw new IndexOutOfBoundsException("Index = " + index + ". Valid range={0; " + (rows.length - 1) + "}");
+        if (rows.length == 0) {
+            throw new IndexOutOfBoundsException("Matrix is empty, rows count = 0.");
+        }
+        if (index < 0 || index >= rows[0].getSize()) {
+            throw new IndexOutOfBoundsException("Index = " + index + ". Valid range={0; " + (rows[0].getSize() - 1) + "}");
         }
 
         double[] column = new double[rows.length];
@@ -125,7 +128,7 @@ public class Matrix {
         Vector[] vectors = new Vector[getColumnsCount()];
 
         for (int i = 0; i < vectors.length; i++) {
-            vectors[i] = new Vector(getColumn(i));
+            vectors[i] = getColumn(i);
         }
 
         rows = vectors;
@@ -179,21 +182,15 @@ public class Matrix {
     }
 
     private void swapRows(int rowIndex1, int rowIndex2) {
-        if (rowIndex1 < 0 || rowIndex1 >= rows.length) {
-            throw new IndexOutOfBoundsException("rowIndex1 = " + rowIndex1 + ". Valid range={0; " + (rows.length - 1) + "}");
-        }
-        if (rowIndex2 < 0 || rowIndex2 >= rows.length) {
-            throw new IndexOutOfBoundsException("rowIndex2 = " + rowIndex2 + ". Valid range={0; " + (rows.length - 1) + "}");
-        }
-
         Vector row1 = new Vector(rows[rowIndex1]);
         rows[rowIndex1] = new Vector(rows[rowIndex2]);
         rows[rowIndex2] = row1;
     }
 
     private void triangulate() {
+        double epsilon = 1.0e-10;
+
         for (int i = 0; i < getRowsCount(); i++) {
-            double epsilon = 1.0e-10;
 
             if (Math.abs(rows[i].getElement(i)) <= epsilon) {
                 for (int j = 0; j < getRowsCount(); j++) {
@@ -209,11 +206,11 @@ public class Matrix {
             for (int j = i; j < rows.length - 1; j++) {
                 Vector temp = new Vector(rows[i]);
 
-                if (temp.getElement(i) == 0) {
+                if (Math.abs(temp.getElement(i)) <= epsilon) {
                     continue;
                 }
 
-                temp.multiplyByScalar(rows[j + 1].getElement(i) / temp.getElement(i)); /// temp.getElement(i)
+                temp.multiplyByScalar(rows[j + 1].getElement(i) / temp.getElement(i));
                 rows[j + 1].subtract(temp);
             }
         }

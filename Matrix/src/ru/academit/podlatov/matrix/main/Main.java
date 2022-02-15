@@ -12,6 +12,7 @@ public class Main {
 
         Matrix matrix2 = new Matrix(doubles);
         System.out.println("matrix2: " + matrix2);
+        System.out.println();
 
         Matrix matrix3 = new Matrix(matrix2);
         matrix3.transpose();

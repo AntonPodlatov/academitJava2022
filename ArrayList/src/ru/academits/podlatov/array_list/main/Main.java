@@ -2,32 +2,35 @@ package ru.academits.podlatov.array_list.main;
 
 import ru.academits.podlatov.array_list.ArrayList;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class Main {
     public static void main(String[] args) {
-        ArrayList<Integer> qq = new ArrayList<>();
-        qq.add(1);
-        qq.add(2);
-        qq.add(3);
-        qq.add(4);
-        qq.add(5);
-        qq.add(6);
-        qq.add(7);
-        qq.add(8);
-        System.out.println(qq);
+        ArrayList<Integer> integers = new ArrayList<>();
+        integers.add(1);
+        integers.add(2);
+        integers.add(3);
+        integers.add(4);
+        integers.add(5);
+        integers.add(6);
+        integers.add(7);
+        integers.add(8);
+        integers.add(3, 9);
+        integers.add(0, 34);
+        integers.add(1, 0);
+        integers.add(null);
+        integers.addAll(3, Arrays.asList(0, 1, 2, 3, 4));
+        System.out.println("Integers: " + integers);
 
-        qq.add(3, 9);
-        System.out.println(qq);
+        integers.remove(3);
+        System.out.println("Integers, the element at index 3 is removed: " + integers);
 
-        qq.remove(3);
-        System.out.println(qq);
-        System.out.println(qq.contains(123));
+        System.out.println("Integers size: " + integers.size());
 
-        ArrayList<String> strings = new ArrayList<>();
-        strings.add("yyy");
 
-        Iterator<String> iterator = strings.iterator();
-        System.out.println(iterator.hasNext());
+        System.out.println("First index of 0: " + integers.indexOf(0));
+        System.out.println("Last index of 0: " + integers.lastIndexOf(0));
+        System.out.println("Last index of null: " + integers.lastIndexOf(null));
     }
 }

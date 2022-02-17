@@ -42,7 +42,9 @@ public class HashTable<T> implements Collection<T> {
         public T next() {
             if (modificationsCount != modCount) {
                 throw new ConcurrentModificationException("Elements count in the table has changed during the crawl.");
-            } else if (!hasNext()) {
+            }
+
+            if (!hasNext()) {
                 throw new NoSuchElementException("Еnd of table.");
             }
 
@@ -61,6 +63,7 @@ public class HashTable<T> implements Collection<T> {
                     arrayIndex++;
                 }
             }
+
             passedListElementsCount++;
             passedTotalCount++;
 
@@ -90,6 +93,7 @@ public class HashTable<T> implements Collection<T> {
 
             return true;
         }
+
         listsArray[listsArrayIndex].add(t);
         elementsCount++;
         modCount++;
@@ -187,7 +191,9 @@ public class HashTable<T> implements Collection<T> {
     public boolean retainAll(Collection<?> c) {
         if (c == null) {
             throw new NullPointerException("Collection is null.");
-        } else if (c.size() == 0) {
+        }
+
+        if (c.size() == 0) {
             return false;
         }
 
@@ -212,6 +218,7 @@ public class HashTable<T> implements Collection<T> {
         for (ArrayList<T> list : listsArray) {
             list.clear();
         }
+
         elementsCount = 0;
         modCount = 0;
     }
@@ -226,6 +233,7 @@ public class HashTable<T> implements Collection<T> {
             objects[i] = iterator.next();
             i++;
         }
+
         return objects;
     }
 
@@ -248,6 +256,6 @@ public class HashTable<T> implements Collection<T> {
 
     @Override
     public String toString() {
-        return  Arrays.toString(listsArray);
+        return Arrays.toString(listsArray);
     }
 }

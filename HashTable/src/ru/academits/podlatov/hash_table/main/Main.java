@@ -9,6 +9,7 @@ public class Main {
         HashTable<Integer> hashTable = new HashTable<>(5);
 
         hashTable.addAll(Arrays.asList(1, 2, 3, 4, 5));
+
         for (Integer i : hashTable) {
             System.out.println(i);
         }

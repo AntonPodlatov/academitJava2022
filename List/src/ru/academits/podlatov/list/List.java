@@ -13,7 +13,7 @@ public class List<T> {
     public T getFirst() {
         checkEmpty();
 
-        return head.get();
+        return head.getData();
     }
 
     private Node<T> getNode(int index) {
@@ -21,23 +21,21 @@ public class List<T> {
 
         Node<T> node = head;
 
-        int i = 0;
-        while (i < index) {
+        for (int i = 0; i < index; i++) {
             node = node.getNext();
-            i++;
         }
 
         return node;
     }
 
     public T get(int index) {
-        return getNode(index).get();
+        return getNode(index).getData();
     }
 
     public T set(int index, T data) {
         Node<T> node = getNode(index);
-        T oldData = node.get();
-        node.set(data);
+        T oldData = node.getData();
+        node.setData(data);
 
         return oldData;
     }
@@ -45,7 +43,7 @@ public class List<T> {
     private T removeFirst() {
         checkEmpty();
 
-        T removedData = head.get();
+        T removedData = head.getData();
         head = head.getNext();
         size--;
         return removedData;
@@ -59,8 +57,10 @@ public class List<T> {
         }
 
         Node<T> previous = getNode(index - 1);
-        T removedData = getNode(index).get();
-        previous.setNext(getNode(index).getNext());
+        Node<T> removedNode = previous.getNext();
+
+        T removedData = removedNode.getData();
+        previous.setNext(removedNode.getNext());
 
         size--;
 
@@ -72,15 +72,28 @@ public class List<T> {
         Node<T> previous = null;
 
         while (current != null) {
-            if (data == current.get() || current.get().equals(data)) {
-                if (previous != null) {
-                    previous.setNext(current.getNext());
-                } else {
-                    head = current.getNext();
-                }
+            if (data == null) {
+                if (current.getData() == null) {
+                    if (previous != null) {
+                        previous.setNext(current.getNext());
+                    } else {
+                        head = current.getNext();
+                    }
 
-                size--;
-                return true;
+                    size--;
+                    return true;
+                }
+            } else {
+                if (data.equals(current.getData())) {
+                    if (previous != null) {
+                        previous.setNext(current.getNext());
+                    } else {
+                        head = current.getNext();
+                    }
+
+                    size--;
+                    return true;
+                }
             }
 
             previous = current;
@@ -91,7 +104,7 @@ public class List<T> {
     }
 
     public void insertFirst(T data) {
-        head = new Node<>(head, data);
+        head = new Node<>(data, head);
         size++;
     }
 
@@ -103,45 +116,44 @@ public class List<T> {
         }
 
         Node<T> previous = getNode(index - 1);
-        previous.setNext(new Node<>(previous.getNext(), data));
+        previous.setNext(new Node<>(data, previous.getNext()));
         size++;
     }
 
     public void revert() {
-        if (head == null) {
-            return;
-        } else if (size == 1) {
+        if (head == null || size == 1) {
             return;
         }
 
-        Node<T> prevNode = null;
-        Node<T> node = head;
-        Node<T> nextNode = head.getNext();
+        Node<T> previous = null;
+        Node<T> current = head;
+        Node<T> next = head.getNext();
 
-        while (nextNode != null) {
-            node.setNext(prevNode);
-            prevNode = node;
-            node = nextNode;
-            nextNode = node.getNext();
+        while (next != null) {
+            current.setNext(previous);
+            previous = current;
+            current = next;
+            next = current.getNext();
         }
 
-        node.setNext(prevNode);
-        head = node;
+        current.setNext(previous);
+        head = current;
     }
 
     public List<T> copy() {
-        checkEmpty();
+        if (head == null) {
+            return new List<>();
+        }
 
         List<T> listCopy = new List<>();
-        listCopy.head = new Node<>(head.get());
+        listCopy.head = new Node<>(head.getData());
         listCopy.size = size;
 
-        for (Node<T> node = head.getNext(), nodeCopy = listCopy.head; node != null;
-             node = node.getNext()) {
-
-            nodeCopy.setNext(new Node<>(node.get()));
+        for (Node<T> node = head.getNext(), nodeCopy = listCopy.head; node != null; node = node.getNext()) {
+            nodeCopy.setNext(new Node<>(node.getData()));
             nodeCopy = nodeCopy.getNext();
         }
+
         return listCopy;
     }
 
@@ -168,12 +180,12 @@ public class List<T> {
         Node<T> node = head;
 
         while (node.getNext() != null) {
-            stringBuilder.append(node.get());
+            stringBuilder.append(node.getData());
             stringBuilder.append(", ");
             node = node.getNext();
         }
 
-        stringBuilder.append(node.get());
+        stringBuilder.append(node.getData());
         stringBuilder.append("]");
 
         return stringBuilder.toString();

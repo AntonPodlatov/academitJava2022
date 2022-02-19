@@ -4,28 +4,29 @@ class Node<T> {
     private Node<T> next;
     private T data;
 
-    protected Node(Node<T> next, T data) {
+    public Node(T data) {
+        this.data = data;
+    }
+
+    public Node(T data, Node<T> next) {
         this.next = next;
         this.data = data;
     }
 
-    protected Node(T data) {
-        this.data = data;
-    }
 
-    protected Node<T> getNext() {
+    public Node<T> getNext() {
         return next;
     }
 
-    protected void setNext(Node<T> next) {
+    public void setNext(Node<T> next) {
         this.next = next;
     }
 
-    protected T get() {
+    public T getData() {
         return data;
     }
 
-    protected void set(T data) {
+    public void setData(T data) {
         this.data = data;
     }
 }

@@ -287,8 +287,7 @@ public class ArrayList<T> implements List<T> {
     private void checkIndex(int index) {
         if (index >= size || index < 0) {
             int maxIndex = size - 1;
-            System.out.println(maxIndex);
-            //  throw new IllegalArgumentException("Index = " + index + ". Valid range: {0, " + maxIndex + "}.");
+            throw new IllegalArgumentException("Index = " + index + ". Valid range: {0, " + maxIndex + "}.");
         }
     }
 

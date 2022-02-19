@@ -57,7 +57,6 @@ public class Matrix {
             throw new IllegalArgumentException("Array length = " + vectors.length + " Matrix rows count cant be < 1.");
         }
 
-        rows = new Vector[vectors.length];
         int maxVectorSize = 0;
 
         for (Vector v : vectors) {
@@ -66,9 +65,7 @@ public class Matrix {
             }
         }
 
-        if (maxVectorSize == 0) {
-            throw new IllegalArgumentException("Max vector size in vectors = 0. Matrix columns count cant be < 1.");
-        }
+        rows = new Vector[vectors.length];
 
         for (int i = 0; i < rows.length; i++) {
             rows[i] = new Vector(maxVectorSize);
@@ -108,11 +105,8 @@ public class Matrix {
     }
 
     public Vector getColumn(int index) {
-        if (rows.length == 0) {
-            throw new IndexOutOfBoundsException("Matrix is empty, rows count = 0.");
-        }
-        if (index < 0 || index >= rows[0].getSize()) {
-            throw new IndexOutOfBoundsException("Index = " + index + ". Valid range={0; " + (rows[0].getSize() - 1) + "}");
+        if (index < 0 || index >= getColumnsCount()) {
+            throw new IndexOutOfBoundsException("Index = " + index + ". Valid range={0; " + (getColumnsCount() - 1) + "}");
         }
 
         double[] column = new double[rows.length];
@@ -182,18 +176,17 @@ public class Matrix {
     }
 
     private void swapRows(int rowIndex1, int rowIndex2) {
-        Vector row1 = new Vector(rows[rowIndex1]);
-        rows[rowIndex1] = new Vector(rows[rowIndex2]);
+        Vector row1 = rows[rowIndex1];
+        rows[rowIndex1] = rows[rowIndex2];
         rows[rowIndex2] = row1;
     }
 
     private void triangulate() {
         double epsilon = 1.0e-10;
 
-        for (int i = 0; i < getRowsCount(); i++) {
-
+        for (int i = 0; i < rows.length; i++) {
             if (Math.abs(rows[i].getElement(i)) <= epsilon) {
-                for (int j = 0; j < getRowsCount(); j++) {
+                for (int j = 0; j < rows.length; j++) {
                     if (Math.abs(rows[j].getElement(i)) > epsilon) {
                         swapRows(i, j);
                         rows[i].multiplyByScalar(-1);

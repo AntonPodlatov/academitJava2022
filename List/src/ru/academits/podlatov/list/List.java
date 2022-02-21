@@ -1,6 +1,7 @@
 package ru.academits.podlatov.list;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class List<T> {
     private Node<T> head;
@@ -19,13 +20,13 @@ public class List<T> {
     private Node<T> getNode(int index) {
         checkIndex(index);
 
-        Node<T> node = head;
+        Node<T> currentNode = head;
 
         for (int i = 0; i < index; i++) {
-            node = node.getNext();
+            currentNode = currentNode.getNext();
         }
 
-        return node;
+        return currentNode;
     }
 
     public T get(int index) {
@@ -56,11 +57,11 @@ public class List<T> {
             return removeFirst();
         }
 
-        Node<T> previous = getNode(index - 1);
-        Node<T> removedNode = previous.getNext();
+        Node<T> previousNode = getNode(index - 1);
+        Node<T> removedNode = previousNode.getNext();
 
         T removedData = removedNode.getData();
-        previous.setNext(removedNode.getNext());
+        previousNode.setNext(removedNode.getNext());
 
         size--;
 
@@ -68,36 +69,23 @@ public class List<T> {
     }
 
     public boolean removeByData(T data) {
-        Node<T> current = head;
-        Node<T> previous = null;
+        Node<T> currentNode = head;
+        Node<T> previousNode = null;
 
-        while (current != null) {
-            if (data == null) {
-                if (current.getData() == null) {
-                    if (previous != null) {
-                        previous.setNext(current.getNext());
-                    } else {
-                        head = current.getNext();
-                    }
-
-                    size--;
-                    return true;
+        while (currentNode != null) {
+            if (Objects.equals(currentNode.getData(), data)) {
+                if (previousNode != null) {
+                    previousNode.setNext(currentNode.getNext());
+                } else {
+                    head = currentNode.getNext();
                 }
-            } else {
-                if (data.equals(current.getData())) {
-                    if (previous != null) {
-                        previous.setNext(current.getNext());
-                    } else {
-                        head = current.getNext();
-                    }
 
-                    size--;
-                    return true;
-                }
+                size--;
+                return true;
             }
 
-            previous = current;
-            current = current.getNext();
+            previousNode = currentNode;
+            currentNode = currentNode.getNext();
         }
 
         return false;
@@ -109,35 +97,38 @@ public class List<T> {
     }
 
     public void insertByIndex(int index, T data) {
-        checkIndex(index);
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index = " + index + ". valid range: [0, " + size + "]");
+        }
 
         if (index == 0) {
             insertFirst(data);
+            return;
         }
 
-        Node<T> previous = getNode(index - 1);
-        previous.setNext(new Node<>(data, previous.getNext()));
+        Node<T> previousNode = getNode(index - 1);
+        previousNode.setNext(new Node<>(data, previousNode.getNext()));
         size++;
     }
 
     public void revert() {
-        if (head == null || size == 1) {
+        if (size <= 1) {
             return;
         }
 
-        Node<T> previous = null;
-        Node<T> current = head;
-        Node<T> next = head.getNext();
+        Node<T> previousNode = null;
+        Node<T> currentNode = head;
+        Node<T> nextNode = head.getNext();
 
-        while (next != null) {
-            current.setNext(previous);
-            previous = current;
-            current = next;
-            next = current.getNext();
+        while (nextNode != null) {
+            currentNode.setNext(previousNode);
+            previousNode = currentNode;
+            currentNode = nextNode;
+            nextNode = currentNode.getNext();
         }
 
-        current.setNext(previous);
-        head = current;
+        currentNode.setNext(previousNode);
+        head = currentNode;
     }
 
     public List<T> copy() {

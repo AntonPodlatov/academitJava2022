@@ -3,7 +3,6 @@ package ru.academits.podlatov.array_list.main;
 import ru.academits.podlatov.array_list.ArrayList;
 
 import java.util.Arrays;
-import java.util.Iterator;
 
 public class Main {
     public static void main(String[] args) {
@@ -28,9 +27,9 @@ public class Main {
 
         System.out.println("Integers size: " + integers.size());
 
-
         System.out.println("First index of 0: " + integers.indexOf(0));
         System.out.println("Last index of 0: " + integers.lastIndexOf(0));
         System.out.println("Last index of null: " + integers.lastIndexOf(null));
+        System.out.println(integers.size());
     }
 }

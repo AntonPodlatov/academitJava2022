@@ -6,10 +6,11 @@ public class ArrayList<T> implements List<T> {
     private T[] elements;
     private int size;
     private int modCount;
+    final private static int initialCapacity = 10;
 
     public ArrayList(int capacity) {
         if (capacity < 0) {
-            throw new IllegalArgumentException("capacity = " + capacity + ". Capacity can't be < 0.");
+            throw new IndexOutOfBoundsException("capacity = " + capacity + ". Capacity can't be < 0.");
         }
 
         //noinspection unchecked
@@ -17,12 +18,13 @@ public class ArrayList<T> implements List<T> {
     }
 
     public ArrayList() {
-        this(10);
+        this(initialCapacity);
     }
 
-    public void increaseCapacity() {
+    private void increaseCapacity() {
         if (size == 0) {
-            elements = Arrays.copyOf(elements, 10);
+            //noinspection unchecked
+            elements = (T[]) new Object[initialCapacity];
         }
 
         elements = Arrays.copyOf(elements, elements.length * 2);
@@ -40,39 +42,21 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public int indexOf(Object o) {
-        if (o == null) {
-            for (int i = 0; i < size; i++) {
-                if (elements[i] == null) {
-                    return i;
-                }
-            }
-        } else {
-            for (int i = 0; i < size; i++) {
-                if (o.equals(elements[i])) {
-                    return i;
-                }
+        for (int i = 0; i < size; i++) {
+            if (Objects.equals(elements[i], o)) {
+                return i;
             }
         }
-
         return -1;
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        if (o == null) {
-            for (int i = size - 1; i >= 0; i--) {
-                if (elements[i] == null) {
-                    return i;
-                }
-            }
-        } else {
-            for (int i = size - 1; i >= 0; i--) {
-                if (o.equals(elements[i])) {
-                    return i;
-                }
+        for (int i = size - 1; i >= 0; i--) {
+            if (Objects.equals(elements[i], o)) {
+                return i;
             }
         }
-
         return -1;
     }
 
@@ -101,7 +85,7 @@ public class ArrayList<T> implements List<T> {
     @Override
     public void add(int index, T element) {
         if (index > size || index < 0) {
-            throw new IllegalArgumentException("Index = " + index + ". Valid range: {0, " + size + "}.");
+            throw new IndexOutOfBoundsException("Index = " + index + ". Valid range: {0, " + size + "}.");
         }
 
         if (size == elements.length) {
@@ -141,7 +125,7 @@ public class ArrayList<T> implements List<T> {
     public boolean remove(Object o) {
         int index = indexOf(o);
 
-        if (index != 0) {
+        if (index != -1) {
             remove(index);
             return true;
         }
@@ -194,13 +178,15 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public boolean addAll(int index, Collection<? extends T> c) {
-        if (index > size || index < 0) {
-            throw new IllegalArgumentException("Index = " + index + ". Valid range: {0, " + size + 1 + "}.");
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index = " + index + ". Valid range: {0, " + size + "}.");
         }
 
-        if (size + c.size() >= elements.length) {
-            ensureCapacity(elements.length + c.size());
+        if (c.size() == 0) {
+            return false;
         }
+
+        ensureCapacity(size + c.size());
 
         System.arraycopy(elements, index, elements, index + c.size(), size - index);
 
@@ -214,7 +200,7 @@ public class ArrayList<T> implements List<T> {
         size += c.size();
         modCount++;
 
-        return c.size() != 0;
+        return true;
     }
 
     @Override
@@ -249,11 +235,15 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public void clear() {
+        if (isEmpty()) {
+            return;
+        }
+
         for (int i = 0; i < size; i++) {
             elements[i] = null;
         }
 
-        modCount = 0;
+        modCount++;
         size = 0;
     }
 
@@ -285,15 +275,14 @@ public class ArrayList<T> implements List<T> {
     }
 
     private void checkIndex(int index) {
-        if (index >= size || index < 0) {
-            int maxIndex = size - 1;
-            throw new IllegalArgumentException("Index = " + index + ". Valid range: {0, " + maxIndex + "}.");
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index = " + index + ". Valid range: {0, " + (size - 1) + "}.");
         }
     }
 
     private class ArrayListIterator implements Iterator<T> {
         private int currentIndex = -1;
-        private final int modCountAtTimeOfCreation = modCount;
+        private final int initialModCount = modCount;
 
         @Override
         public boolean hasNext() {
@@ -306,7 +295,7 @@ public class ArrayList<T> implements List<T> {
                 throw new NoSuchElementException("There is no next element. The list is over.");
             }
 
-            if (modCountAtTimeOfCreation != modCount) {
+            if (initialModCount != modCount) {
                 throw new ConcurrentModificationException("The size of the list has changed during the crawl.");
             }
 
@@ -317,6 +306,10 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public String toString() {
+        if (size == 0) {
+            return "[]";
+        }
+
         StringBuilder stringBuilder = new StringBuilder("[");
 
         for (T t : this) {
@@ -332,6 +325,15 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public int hashCode() {
+        final int prime = 13;
+        int hash = 1;
+
+        for (T element : this) {
+            int elementHashCode = (element == null) ? 0 : element.hashCode();
+
+            hash = prime * hash + elementHashCode;
+        }
+
         return Arrays.hashCode(elements);
     }
 
@@ -347,8 +349,12 @@ public class ArrayList<T> implements List<T> {
         //noinspection unchecked
         ArrayList<T> arrayList = (ArrayList<T>) o;
 
+        if (size != arrayList.size) {
+            return false;
+        }
+
         for (int i = 0; i < size; i++) {
-            if (elements[i].equals(arrayList.get(i))) {
+            if (Objects.equals(elements[i], arrayList.elements[i])) {
                 return false;
             }
         }

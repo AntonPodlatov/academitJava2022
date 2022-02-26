@@ -140,9 +140,10 @@ public class List<T> {
         listCopy.head = new Node<>(head.getData());
         listCopy.size = size;
 
-        for (Node<T> node = head.getNext(), nodeCopy = listCopy.head; node != null; node = node.getNext()) {
+        for (Node<T> node = head.getNext(), nodeCopy = listCopy.head; node != null;) {
             nodeCopy.setNext(new Node<>(node.getData()));
             nodeCopy = nodeCopy.getNext();
+            node = node.getNext();
         }
 
         return listCopy;

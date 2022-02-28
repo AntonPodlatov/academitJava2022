@@ -30,8 +30,7 @@ public class HashTable<T> implements Collection<T> {
         private int arrayIndex = 0;
         private int listIndex = -1;
         private int passedTotalCount = 0;
-        private final int modCountAtCreationTime = modCount;
-
+        private final int initialModCount = modCount;
 
         @Override
         public boolean hasNext() {
@@ -40,7 +39,7 @@ public class HashTable<T> implements Collection<T> {
 
         @Override
         public T next() {
-            if (modCountAtCreationTime != modCount) {
+            if (initialModCount != modCount) {
                 throw new ConcurrentModificationException("Elements count in the table has changed during the crawl.");
             }
 
@@ -81,14 +80,13 @@ public class HashTable<T> implements Collection<T> {
 
     @Override
     public boolean add(T element) {
-        int listsIndex = getIndex(element);
+        int index = getIndex(element);
 
-        if (lists[listsIndex] == null) {
-            ArrayList<T> newList = new ArrayList<>(1);
-            lists[listsIndex] = newList;
+        if (lists[index] == null) {
+            lists[index] = new ArrayList<>(10);
         }
 
-        lists[listsIndex].add(element);
+        lists[index].add(element);
         elementsCount++;
         modCount++;
 
@@ -101,19 +99,15 @@ public class HashTable<T> implements Collection<T> {
 
     @Override
     public boolean contains(Object o) {
-        int arrayListIndex = getIndex(o);
+        int index = getIndex(o);
 
-        return lists[arrayListIndex] != null && lists[arrayListIndex].contains(o);
+        return lists[index] != null && lists[index].contains(o);
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
         if (c == null) {
             throw new IllegalArgumentException("Collection is null.");
-        }
-
-        if (c.size() == 0) {
-            return true;
         }
 
         for (Object o : c) {
@@ -144,13 +138,13 @@ public class HashTable<T> implements Collection<T> {
 
     @Override
     public boolean remove(Object o) {
-        int listsArrayIndex = getIndex(o);
+        int index = getIndex(o);
 
-        if (lists[listsArrayIndex] == null) {
+        if (lists[index] == null) {
             return false;
         }
 
-        if (lists[listsArrayIndex].remove(o)) {
+        if (lists[index].remove(o)) {
             modCount++;
             elementsCount--;
             return true;
@@ -169,17 +163,24 @@ public class HashTable<T> implements Collection<T> {
             return false;
         }
 
-        int modCountBeforeRemoveAll = modCount;
+        boolean isChanged = false;
 
         for (ArrayList<T> list : lists) {
             if (list != null) {
+                int initialSize = list.size();
+
                 if (list.removeAll(c)) {
-                    modCount++;
+                    elementsCount -= initialSize - list.size();
+                    isChanged = true;
                 }
             }
         }
 
-        return modCountBeforeRemoveAll != modCount;
+        if (isChanged) {
+            modCount++;
+        }
+
+        return isChanged;
     }
 
     @Override
@@ -188,21 +189,33 @@ public class HashTable<T> implements Collection<T> {
             throw new NullPointerException("Collection is null.");
         }
 
+
         if (c.size() == 0) {
-            clear();
+            if (!isEmpty()) {
+                clear();
+                return true;
+            }
+            return false;
         }
 
-        int modCountBeforeRetainAll = modCount;
+        boolean isChanged = false;
 
         for (ArrayList<T> list : lists) {
             if (list != null) {
+                int initialSize = list.size();
+
                 if (list.retainAll(c)) {
-                    modCount++;
+                    elementsCount -= initialSize - list.size();
+                    isChanged = true;
                 }
             }
         }
 
-        return modCountBeforeRetainAll != modCount;
+        if (isChanged) {
+            modCount++;
+        }
+
+        return isChanged;
     }
 
     @Override

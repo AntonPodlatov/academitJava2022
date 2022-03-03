@@ -3,14 +3,15 @@ package ru.academits.podlatov.array_list;
 import java.util.*;
 
 public class ArrayList<T> implements List<T> {
+    private static final int INITIAL_CAPACITY = 10;
+
     private T[] elements;
     private int size;
     private int modCount;
-    final private static int initialCapacity = 10;
 
     public ArrayList(int capacity) {
         if (capacity < 0) {
-            throw new IndexOutOfBoundsException("capacity = " + capacity + ". Capacity can't be < 0.");
+            throw new IllegalArgumentException("capacity = " + capacity + ". Capacity can't be < 0.");
         }
 
         //noinspection unchecked
@@ -18,13 +19,15 @@ public class ArrayList<T> implements List<T> {
     }
 
     public ArrayList() {
-        this(initialCapacity);
+        this(INITIAL_CAPACITY);
     }
 
     private void increaseCapacity() {
         if (size == 0) {
             //noinspection unchecked
-            elements = (T[]) new Object[initialCapacity];
+            elements = (T[]) new Object[INITIAL_CAPACITY];
+
+            return;
         }
 
         elements = Arrays.copyOf(elements, elements.length * 2);
@@ -47,6 +50,7 @@ public class ArrayList<T> implements List<T> {
                 return i;
             }
         }
+
         return -1;
     }
 
@@ -57,6 +61,7 @@ public class ArrayList<T> implements List<T> {
                 return i;
             }
         }
+
         return -1;
     }
 
@@ -312,8 +317,8 @@ public class ArrayList<T> implements List<T> {
 
         StringBuilder stringBuilder = new StringBuilder("[");
 
-        for (T t : this) {
-            stringBuilder.append(t);
+        for (T element : this) {
+            stringBuilder.append(element);
             stringBuilder.append(", ");
         }
 
@@ -334,7 +339,7 @@ public class ArrayList<T> implements List<T> {
             hash = prime * hash + elementHashCode;
         }
 
-        return Arrays.hashCode(elements);
+        return hash;
     }
 
     @Override

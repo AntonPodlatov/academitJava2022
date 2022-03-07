@@ -1,9 +1,7 @@
 package ru.academits.podlatov.tree;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.*;
+import java.util.function.Consumer;
 
 public class Tree<T> {
     private Node<T> root;
@@ -18,20 +16,24 @@ public class Tree<T> {
     }
 
     private int compare(T data1, T data2) {
+        if (comparator != null) {
+            return comparator.compare(data1, data2);
+        }
+
         if (data1 == null) {
             if (data2 == null) {
                 return 0;
-            } else {
-                return -1;
             }
+
+            return -1;
         }
+
         if (data2 == null) {
             return 1;
         }
 
         //noinspection unchecked
-        return (comparator == null) ?
-                ((Comparable<? super T>) data1).compareTo(data2) : comparator.compare(data1, data2);
+        return ((Comparable<? super T>) data1).compareTo(data2);
     }
 
     public int getSize() {
@@ -42,62 +44,43 @@ public class Tree<T> {
         if (root == null) {
             root = new Node<>(data);
             size++;
-
             return;
         }
 
         Node<T> currentNode = root;
-        insert(data, currentNode);
-    }
 
-    private void insert(T data, Node<T> currentNode) {
-        if (compare(data, currentNode.getData()) < 0) {
-            if (currentNode.getLeft() != null) {
-                currentNode = currentNode.getLeft();
-                insert(data, currentNode);
+        while (true) {
+            if (compare(data, currentNode.getData()) < 0) {
+                if (currentNode.getLeft() != null) {
+                    currentNode = currentNode.getLeft();
+                } else {
+                    currentNode.setLeft(new Node<>(data));
+                    size++;
+                    return;
+                }
             } else {
-                currentNode.setLeft(new Node<>(data));
-                size++;
-            }
-        } else {
-            if (currentNode.getRight() != null) {
-                currentNode = currentNode.getRight();
-                insert(data, currentNode);
-            } else {
-                currentNode.setRight(new Node<>(data));
-                size++;
+                if (currentNode.getRight() != null) {
+                    currentNode = currentNode.getRight();
+                } else {
+                    currentNode.setRight(new Node<>(data));
+                    size++;
+                    return;
+                }
             }
         }
     }
 
-    public Node<T> find(T data) {
-        Node<T> parentNode = findParentOf(data);
-        boolean isRoot = compare(data, root.getData()) == 0;
+    public boolean contains(T data) {
+        Node<T> parentNode = getParentOf(data);
 
         if (parentNode == null) {
-            if (isRoot) {
-                return root;
-            }
-            return null;
+            return compare(data, root.getData()) == 0;
         }
 
-        Node<T> node = null;
-
-        if (parentNode.getLeft() != null) {
-            if (compare(data, parentNode.getLeft().getData()) == 0) {
-                node = parentNode.getLeft();
-            }
-        }
-        if (parentNode.getRight() != null) {
-            if (compare(data, parentNode.getRight().getData()) == 0) {
-                node = parentNode.getRight();
-            }
-        }
-
-        return node;
+        return true;
     }
 
-    public Node<T> findParentOf(T data) {
+    private Node<T> getParentOf(T data) {
         Node<T> currentNode = root;
         Node<T> parentNode = null;
 
@@ -124,53 +107,90 @@ public class Tree<T> {
         }
     }
 
-    public boolean remove(T removableData) {
-        Node<T> parentNode = findParentOf(removableData);
-        Node<T> removableNode = find(removableData);
+    public boolean remove(T data) {
+        Node<T> parentNode = getParentOf(data);
+        Node<T> removableNode;
 
-        if (removableNode == null) {
+        if (parentNode == null) {
+            if (compare(data, root.getData()) == 0) {
+                removeRoot();
+                size--;
+                return true;
+            }
+
             return false;
         }
 
-        boolean removableIsLeft = compare(removableData, parentNode.getData()) < 0;
+        boolean isLeft = compare(data, parentNode.getData()) < 0;
+
+        if (isLeft) {
+            removableNode = parentNode.getLeft();
+        } else {
+            removableNode = parentNode.getRight();
+        }
 
         if (removableNode.hasNoChildren()) {
-            if (removableIsLeft) {
+            if (isLeft) {
                 parentNode.setLeft(null);
             } else {
                 parentNode.setRight(null);
             }
 
+            size--;
             return true;
         }
 
         if (removableNode.hasOnlyRight()) {
-            if (removableIsLeft) {
+            if (isLeft) {
                 parentNode.setLeft(removableNode.getRight());
             } else {
                 parentNode.setRight(removableNode.getRight());
             }
 
+            size--;
             return true;
         }
 
         if (removableNode.hasOnlyLeft()) {
-            if (removableIsLeft) {
+            if (isLeft) {
                 parentNode.setLeft(removableNode.getLeft());
             } else {
                 parentNode.setRight(removableNode.getLeft());
             }
 
+            size--;
             return true;
         }
 
         if (removableNode.has2Children()) {
             removeNodeWith2Children(removableNode);
 
+            size--;
             return true;
         }
 
         return false;
+    }
+
+    private void removeRoot() {
+        if (root.hasNoChildren()) {
+            root = null;
+            return;
+        }
+
+        if (root.hasOnlyLeft()) {
+            root = root.getLeft();
+            return;
+        }
+
+        if (root.hasOnlyRight()) {
+            root = root.getRight();
+            return;
+        }
+
+        if (root.has2Children()) {
+            removeNodeWith2Children(root);
+        }
     }
 
     private void removeNodeWith2Children(Node<T> removableNode) {
@@ -191,58 +211,65 @@ public class Tree<T> {
         }
     }
 
-    public void breadthTraversal() {
+    public void traverseForBreadth(Consumer<T> consumer) {
+        if (root == null) {
+            throw new UnsupportedOperationException("Tree is empty.");
+        }
+
         Queue<Node<T>> queue = new LinkedList<>();
         queue.add(root);
 
         while (!queue.isEmpty()) {
             Node<T> currentNode = queue.remove();
-            System.out.print("currentNodeData: " + currentNode.getData());
+            consumer.accept(currentNode.getData());
 
             if (currentNode.getLeft() != null) {
-                System.out.print(", leftNodeData: " + currentNode.getLeft().getData());
                 queue.add(currentNode.getLeft());
-
             }
 
             if (currentNode.getRight() != null) {
-                System.out.println(", rightNodeData: " + currentNode.getRight().getData());
                 queue.add(currentNode.getRight());
             }
-
-            System.out.println();
         }
     }
 
-    private void visit(Node<T> node) {
-        System.out.println(node);
+    private void visit(Node<T> node, Consumer<T> consumer) {
+        consumer.accept(node.getData());
 
         if (node.getLeft() != null) {
-            visit(node.getLeft());
+            visit(node.getLeft(), consumer);
         }
 
         if (node.getRight() != null) {
-            visit(node.getRight());
+            visit(node.getRight(), consumer);
         }
     }
 
-    public void depthTraversalRecursive() {
-        visit(root);
+    public void traverseForDepthRecursive(Consumer<T> consumer) {
+        if (root == null) {
+            throw new UnsupportedOperationException("Tree is empty.");
+        }
+
+        visit(root, consumer);
     }
 
-    public void depthTraversal() {
-        Stack<Node<T>> stack = new Stack<>();
+    public void traverseForDepth(Consumer<T> consumer) {
+        if (root == null) {
+            throw new UnsupportedOperationException("Tree is empty.");
+        }
+
+        Deque<Node<T>> stack = new LinkedList<>();
         stack.push(root);
 
         while (!stack.isEmpty()) {
             Node<T> currentNode = stack.pop();
-            System.out.println(currentNode);
+            consumer.accept(currentNode.getData());
 
-            if(currentNode.getRight()!=null){
+            if (currentNode.getRight() != null) {
                 stack.push(currentNode.getRight());
             }
 
-            if(currentNode.getLeft()!=null){
+            if (currentNode.getLeft() != null) {
                 stack.push(currentNode.getLeft());
             }
         }

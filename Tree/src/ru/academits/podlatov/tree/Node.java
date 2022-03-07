@@ -1,6 +1,6 @@
 package ru.academits.podlatov.tree;
 
-public class Node<T> {
+class Node<T> {
     private Node<T> left;
     private Node<T> right;
     private T data;
@@ -34,23 +34,18 @@ public class Node<T> {
     }
 
     public boolean hasNoChildren() {
-        return getLeft() == null && getRight() == null;
+        return left == null && right == null;
     }
 
     public boolean hasOnlyLeft() {
-        return getLeft() != null && getRight() == null;
+        return left != null && right == null;
     }
 
     public boolean hasOnlyRight() {
-        return getLeft() == null && getRight() != null;
+        return left == null && right != null;
     }
 
     public boolean has2Children() {
-        return getLeft() != null && getRight() != null;
-    }
-
-    @Override
-    public String toString() {
-        return "[nodeData: " + data + "]";
+        return left != null && right != null;
     }
 }

@@ -16,8 +16,9 @@ public class Main {
         tree.insert(-10);
         tree.insert(-2);
         tree.insert(null);
-        tree.depthTraversalRecursive();
-        System.out.println();
-        tree.depthTraversal();
+
+        tree.traverseForBreadth(System.out::println);
+        boolean isRemoved = tree.remove(1);
+        tree.traverseForBreadth(System.out::println);
     }
 }

@@ -7,13 +7,19 @@ public class HashTable<T> implements Collection<T> {
     private int elementsCount;
     private int modCount;
 
+    private static final int DEFAULT_LENGTH = 10;
+
     public HashTable(int arrayLength) {
         if (arrayLength <= 0) {
-            throw new IndexOutOfBoundsException("Array length = " + arrayLength + ". Capacity cant be <= 0.");
+            throw new IllegalArgumentException("Array length = " + arrayLength + ". Capacity cant be <= 0.");
         }
 
         //noinspection unchecked
         lists = (ArrayList<T>[]) new ArrayList[arrayLength];
+    }
+
+    public HashTable() {
+        this(DEFAULT_LENGTH);
     }
 
     @Override
@@ -47,7 +53,7 @@ public class HashTable<T> implements Collection<T> {
                 throw new NoSuchElementException("Еnd of table.");
             }
 
-            while (lists[arrayIndex] == null) {
+            while (lists[arrayIndex] == null || lists[arrayIndex].size() == 0) {
                 arrayIndex++;
             }
 
@@ -57,19 +63,13 @@ public class HashTable<T> implements Collection<T> {
                 listIndex = 0;
                 arrayIndex++;
 
-                while (lists[arrayIndex] == null) {
+                while (lists[arrayIndex] == null || lists[arrayIndex].size() == 0) {
                     arrayIndex++;
                 }
             }
 
             passedTotalCount++;
-
             return lists[arrayIndex].get(listIndex);
-        }
-
-        @Override
-        public void remove() {
-            Iterator.super.remove();
         }
     }
 
@@ -189,15 +189,6 @@ public class HashTable<T> implements Collection<T> {
             throw new NullPointerException("Collection is null.");
         }
 
-
-        if (c.size() == 0) {
-            if (!isEmpty()) {
-                clear();
-                return true;
-            }
-            return false;
-        }
-
         boolean isChanged = false;
 
         for (ArrayList<T> list : lists) {
@@ -241,6 +232,7 @@ public class HashTable<T> implements Collection<T> {
         Object[] objects = new Object[elementsCount];
 
         int i = 0;
+
         for (Object o : this) {
             objects[i] = o;
             i++;
@@ -257,6 +249,7 @@ public class HashTable<T> implements Collection<T> {
         }
 
         int i = 0;
+
         for (T element : this) {
             //noinspection unchecked
             a[i] = (T1) element;

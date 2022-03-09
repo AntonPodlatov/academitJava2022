@@ -1,4 +1,4 @@
-package ru.academits.podlatov.person;
+package ru.academits.podlatov.lambdas;
 
 import java.util.Objects;
 
@@ -8,11 +8,13 @@ public class Person {
 
     public Person(String name, int age) {
         if (name == null) {
-            throw new IllegalArgumentException("Name can't be Null");
+            throw new IllegalArgumentException("Name can't be null");
         }
+
         if (age < 0) {
             throw new IllegalArgumentException("Age = " + age + ", age can't be < 0.");
         }
+
         this.name = name;
         this.age = age;
     }

@@ -11,6 +11,10 @@ public class Tree<T> {
     public Tree() {
     }
 
+    public boolean isEmpty() {
+        return root == null;
+    }
+
     public Tree(Comparator<? super T> comparator) {
         this.comparator = comparator;
     }
@@ -71,6 +75,10 @@ public class Tree<T> {
     }
 
     public boolean contains(T data) {
+        if (root == null) {
+            return false;
+        }
+
         Node<T> parentNode = getParentOf(data);
 
         if (parentNode == null) {
@@ -81,6 +89,8 @@ public class Tree<T> {
     }
 
     private Node<T> getParentOf(T data) {
+        if (isEmpty()) return null;
+
         Node<T> currentNode = root;
         Node<T> parentNode = null;
 
@@ -89,7 +99,9 @@ public class Tree<T> {
 
             if (comparisonResult == 0) {
                 return parentNode;
-            } else if (comparisonResult < 0) {
+            }
+
+            if (comparisonResult < 0) {
                 if (currentNode.getLeft() != null) {
                     parentNode = currentNode;
                     currentNode = currentNode.getLeft();
@@ -108,8 +120,11 @@ public class Tree<T> {
     }
 
     public boolean remove(T data) {
+        if (isEmpty()) {
+            return false;
+        }
+
         Node<T> parentNode = getParentOf(data);
-        Node<T> removableNode;
 
         if (parentNode == null) {
             if (compare(data, root.getData()) == 0) {
@@ -122,6 +137,7 @@ public class Tree<T> {
         }
 
         boolean isLeft = compare(data, parentNode.getData()) < 0;
+        Node<T> removableNode;
 
         if (isLeft) {
             removableNode = parentNode.getLeft();
@@ -162,14 +178,10 @@ public class Tree<T> {
             return true;
         }
 
-        if (removableNode.has2Children()) {
-            removeNodeWith2Children(removableNode);
+        removeNodeWith2Children(removableNode, parentNode);
+        size--;
 
-            size--;
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     private void removeRoot() {
@@ -189,11 +201,11 @@ public class Tree<T> {
         }
 
         if (root.has2Children()) {
-            removeNodeWith2Children(root);
+            removeNodeWith2Children(root, null);
         }
     }
 
-    private void removeNodeWith2Children(Node<T> removableNode) {
+    private void removeNodeWith2Children(Node<T> removableNode, Node<T> removableNodeParent) {
         Node<T> mostLeftParent = removableNode;
         Node<T> mostLeft = removableNode.getRight();
 
@@ -201,19 +213,26 @@ public class Tree<T> {
             mostLeftParent = mostLeft;
             mostLeft = mostLeft.getLeft();
         }
+        mostLeftParent.setLeft(mostLeft.getRight());
+        mostLeft.setRight(removableNode.getRight());
+        mostLeft.setLeft(removableNode.getLeft());
 
-        removableNode.setData(mostLeft.getData());
-
-        if (mostLeft.hasOnlyRight()) {
-            mostLeftParent.setLeft(mostLeft.getRight());
-        } else {
-            mostLeftParent.setLeft(null);
+        if (removableNodeParent == null) {
+            root = mostLeft;
+            return;
         }
+
+        if (removableNodeParent.getLeft() == removableNode) {
+            removableNodeParent.setLeft(mostLeft);
+            return;
+        }
+
+        removableNodeParent.setRight(mostLeft);
     }
 
     public void traverseForBreadth(Consumer<T> consumer) {
-        if (root == null) {
-            throw new UnsupportedOperationException("Tree is empty.");
+        if (isEmpty()) {
+            return;
         }
 
         Queue<Node<T>> queue = new LinkedList<>();
@@ -246,16 +265,16 @@ public class Tree<T> {
     }
 
     public void traverseForDepthRecursive(Consumer<T> consumer) {
-        if (root == null) {
-            throw new UnsupportedOperationException("Tree is empty.");
+        if (isEmpty()) {
+            return;
         }
 
         visit(root, consumer);
     }
 
     public void traverseForDepth(Consumer<T> consumer) {
-        if (root == null) {
-            throw new UnsupportedOperationException("Tree is empty.");
+        if (isEmpty()) {
+            return;
         }
 
         Deque<Node<T>> stack = new LinkedList<>();

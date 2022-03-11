@@ -4,21 +4,24 @@ import ru.academits.podlatov.tree.Tree;
 
 public class Main {
     public static void main(String[] args) {
-        Tree<Integer> tree = new Tree<>();
-        tree.insert(1);
-        tree.insert(0);
-        tree.insert(2);
-        tree.insert(-1);
-        tree.insert(1);
-        tree.insert(3);
-        tree.insert(-5);
-        tree.insert(2);
-        tree.insert(-10);
-        tree.insert(-2);
-        tree.insert(null);
+        Tree<Double> tree1 = new Tree<>();
+        tree1.insert(1.0);
+        tree1.insert(0.0);
+        tree1.insert(2.0);
+        tree1.insert(-1.0);
+        tree1.insert(1.0);
+        tree1.insert(3.0);
+        tree1.insert(-5.0);
+        tree1.insert(2.9);
+        tree1.insert(-10.0);
+        tree1.insert(-2.0);
+        tree1.insert(null);
 
-        tree.traverseForBreadth(System.out::println);
-        boolean isRemoved = tree.remove(1);
-        tree.traverseForBreadth(System.out::println);
+        tree1.traverseForBreadth(System.out::println);
+        tree1.remove(1.0);
+        tree1.traverseForBreadth(System.out::println);
+
+        Tree<Integer> tree2 = new Tree<>();
+        System.out.println(tree2.remove(23));
     }
 }

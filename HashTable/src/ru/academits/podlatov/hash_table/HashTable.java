@@ -53,7 +53,7 @@ public class HashTable<T> implements Collection<T> {
                 throw new NoSuchElementException("Еnd of table.");
             }
 
-            while (lists[arrayIndex] == null || lists[arrayIndex].size() == 0) {
+            while (lists[arrayIndex] == null || lists[arrayIndex].isEmpty()) {
                 arrayIndex++;
             }
 
@@ -63,7 +63,7 @@ public class HashTable<T> implements Collection<T> {
                 listIndex = 0;
                 arrayIndex++;
 
-                while (lists[arrayIndex] == null || lists[arrayIndex].size() == 0) {
+                while (lists[arrayIndex] == null || lists[arrayIndex].isEmpty()) {
                     arrayIndex++;
                 }
             }

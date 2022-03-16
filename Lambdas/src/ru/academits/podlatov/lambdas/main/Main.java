@@ -34,28 +34,30 @@ public class Main {
         System.out.println("Средний возраст людей младше 18 лет: " + averageAgeUnder18 + " лет.");
         System.out.println();
 
-        Map<String, Double> averageAgeByName = people.stream()
+        Map<String, Double> averageAgesByNames = people.stream()
                 .collect(Collectors.groupingBy(Person::getName, Collectors.averagingDouble(Person::getAge)));
 
-        System.out.println("Средний возраст носителей имен: " + averageAgeByName);
+        System.out.println("Средний возраст носителей имен: " + averageAgesByNames);
         System.out.println();
 
-        List<Person> peopleAged20To45;
-        peopleAged20To45 = people.stream()
+        List<Person> peopleAged20To45 = people.stream()
                 .filter(x -> x.getAge() >= 20 && x.getAge() <= 45)
-                .sorted((p1, p2) -> p2.getAge() - p1.getAge()).collect(Collectors.toList());
+                .sorted((p1, p2) -> p2.getAge() - p1.getAge())
+                .toList();
 
         System.out.println("Люди в возрасте от 20 до 45 лет по убыванию возраста: " + peopleAged20To45);
         System.out.println();
 
         //Задача 2
-        int number;
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Введите количество требуемых корней чисел: ");
-        number = scanner.nextInt();
-        System.out.println();
 
-        Stream<Double> squareRoots = Stream.iterate(0, x -> x + 1)
+        System.out.print("Введите количество требуемых корней чисел: ");
+
+        int number = scanner.nextInt();
+
+        System.out.println();
+        Stream<Double> squareRoots = Stream
+                .iterate(0, x -> x + 1)
                 .map(Math::sqrt)
                 .limit(number);
 

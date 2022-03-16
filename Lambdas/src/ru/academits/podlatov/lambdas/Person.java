@@ -24,6 +24,10 @@ public class Person {
     }
 
     public void setName(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name can't be null.");
+        }
+
         this.name = name;
     }
 
@@ -32,6 +36,10 @@ public class Person {
     }
 
     public void setAge(int age) {
+        if (age <= 0) {
+            throw new IllegalArgumentException("Age = " + age + ". Age can't be <=0");
+        }
+
         this.age = age;
     }
 

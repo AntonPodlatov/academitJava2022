@@ -1,7 +1,6 @@
-package ru.academit.podlatov.temperature_converter.model;
+package ru.academit.podlatov.temperature_converter.model.scales;
 
-public class Celsius implements Scale {
-
+public class CelsiusScale implements Scale {
     @Override
     public double convertToCelsius(double value) {
         return value;

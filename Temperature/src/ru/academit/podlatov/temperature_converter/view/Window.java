@@ -1,20 +1,25 @@
 package ru.academit.podlatov.temperature_converter.view;
 
-import ru.academit.podlatov.temperature_converter.controller.Converter;
-import ru.academit.podlatov.temperature_converter.model.Celsius;
-import ru.academit.podlatov.temperature_converter.model.Fahrenheit;
-import ru.academit.podlatov.temperature_converter.model.Kelvin;
-import ru.academit.podlatov.temperature_converter.model.Scale;
-import ru.academit.podlatov.temperature_converter.utils.Utils;
+import ru.academit.podlatov.temperature_converter.model.Converter;
+import ru.academit.podlatov.temperature_converter.model.scales.Scale;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 public class Window {
+    Scale[] scales;
+    Converter converter;
+
+    public Window(Scale[] scales, Converter converter) {
+        this.scales = scales;
+        this.converter = converter;
+    }
+
     public void start() {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = getFrame();
+
             try {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
@@ -22,21 +27,20 @@ public class Window {
             }
 
             JTextField inputField = new JTextField();
-            inputField.setBorder(new TitledBorder("INPUT VALUE"));
+            inputField.setBorder(new TitledBorder("Input value"));
 
-            Scale[] scales = {new Celsius(), new Fahrenheit(), new Kelvin()};
             JComboBox<Scale> fromBox = new JComboBox<>(scales);
             JComboBox<Scale> toBox = new JComboBox<>(scales);
-            fromBox.setBorder(new TitledBorder("FROM"));
-            toBox.setBorder(new TitledBorder("TO"));
+            fromBox.setBorder(new TitledBorder("From"));
+            toBox.setBorder(new TitledBorder("To"));
 
             JTextField outputField = new JTextField();
-            outputField.setBorder(new TitledBorder("RESULT"));
+            outputField.setBorder(new TitledBorder("Result"));
             outputField.setEditable(false);
 
-            JButton convertButton = new JButton("do conversion");
+            JButton convertButton = new JButton("convert");
             convertButton.setBorderPainted(true);
-            convertButton.setBorder(new TitledBorder("CONVERT"));
+            convertButton.setBorder(new TitledBorder("Convert"));
             convertButton.setFocusPainted(false);
 
             convertButton.addActionListener(e -> {
@@ -45,15 +49,21 @@ public class Window {
 
                 if (inputField.getText().isEmpty() || fromScale == null || toScale == null) {
                     JOptionPane.showMessageDialog(frame, "Specify all inputs.", "Error", JOptionPane.INFORMATION_MESSAGE);
-                    outputField.setText("");
-                } else if (!Utils.isNumeric(inputField.getText())) {
-                    JOptionPane.showMessageDialog(frame, "Not a number.", "Error", JOptionPane.INFORMATION_MESSAGE);
-                    outputField.setText("");
+                } else if (inputField.getText().contains(",")) {
+                    JOptionPane.showMessageDialog(frame, "Wrong number format.\nUse a dot instead of a comma as the decimal separator.",
+                            "Error", JOptionPane.INFORMATION_MESSAGE);
+                    inputField.setText("");
                 } else {
-                    Converter converter = new Converter();
-                    double result = converter.convert(fromScale, toScale, Double.parseDouble(inputField.getText()));
+                    try {
+                        double numberFromTextField = Double.parseDouble(inputField.getText());
+                        double result = converter.convert(fromScale, toScale, numberFromTextField);
+                        double roundResult = Math.round(result * 100.0) / 100.0;
 
-                    outputField.setText(Double.toString(result));
+                        outputField.setText(Double.toString(roundResult));
+                    } catch (NumberFormatException exception) {
+                        JOptionPane.showMessageDialog(frame, "Not a number.", "Error", JOptionPane.INFORMATION_MESSAGE);
+                        inputField.setText("");
+                    }
                 }
             });
 
@@ -68,12 +78,15 @@ public class Window {
     }
 
     private JFrame getFrame() {
-        String name = "Temperature converter";
-        final JFrame jFrame = new JFrame(name);
-        final Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        JFrame jFrame = new JFrame("Temperature converter");
+
+        Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
         int defaultWidth = 430;
         int defaultHeight = 350;
-        jFrame.setBounds(dimension.width / 2 - defaultWidth / 2, dimension.height / 2 - defaultHeight / 2, defaultWidth, defaultHeight);
+        jFrame.setBounds(screenDimension.width / 2 - defaultWidth / 2, screenDimension.height / 2 - defaultHeight / 2, defaultWidth, defaultHeight);
+
+        Dimension minDimension = new Dimension(defaultWidth / 2, (int) (defaultHeight * 0.8));
+        jFrame.setMinimumSize(minDimension);
 
         jFrame.setAlwaysOnTop(true);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

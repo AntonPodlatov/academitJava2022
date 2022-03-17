@@ -1,6 +1,6 @@
-package ru.academit.podlatov.temperature_converter.model;
+package ru.academit.podlatov.temperature_converter.model.scales;
 
-public class Kelvin implements Scale {
+public class KelvinScale implements Scale {
     @Override
     public double convertToCelsius(double value) {
         return value - 273.15;

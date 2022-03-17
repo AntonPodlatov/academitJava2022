@@ -37,7 +37,7 @@ public class Person {
 
     public void setAge(int age) {
         if (age <= 0) {
-            throw new IllegalArgumentException("Age = " + age + ". Age can't be <=0");
+            throw new IllegalArgumentException("Age = " + age + ". Age can't be <= 0");
         }
 
         this.age = age;

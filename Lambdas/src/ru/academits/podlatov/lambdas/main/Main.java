@@ -52,12 +52,10 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Введите количество требуемых корней чисел: ");
-
         int number = scanner.nextInt();
 
         System.out.println();
-        Stream<Double> squareRoots = Stream
-                .iterate(0, x -> x + 1)
+        Stream<Double> squareRoots = Stream.iterate(0, x -> x + 1)
                 .map(Math::sqrt)
                 .limit(number);
 

@@ -11,12 +11,12 @@ public class Tree<T> {
     public Tree() {
     }
 
-    public boolean isEmpty() {
-        return root == null;
-    }
-
     public Tree(Comparator<? super T> comparator) {
         this.comparator = comparator;
+    }
+
+    public boolean isEmpty() {
+        return root == null;
     }
 
     private int compare(T data1, T data2) {
@@ -89,7 +89,9 @@ public class Tree<T> {
     }
 
     private Node<T> getParentOf(T data) {
-        if (isEmpty()) return null;
+        if (isEmpty()) {
+            return null;
+        }
 
         Node<T> currentNode = root;
         Node<T> parentNode = null;
@@ -209,12 +211,16 @@ public class Tree<T> {
         Node<T> mostLeftParent = removableNode;
         Node<T> mostLeft = removableNode.getRight();
 
-        while (mostLeft.getLeft() != null) {
-            mostLeftParent = mostLeft;
-            mostLeft = mostLeft.getLeft();
+        if (mostLeft.getLeft() != null) {
+            while (mostLeft.getLeft() != null) {
+                mostLeftParent = mostLeft;
+                mostLeft = mostLeft.getLeft();
+            }
+
+            mostLeftParent.setLeft(mostLeft.getRight());
+            mostLeft.setRight(removableNode.getRight());
         }
-        mostLeftParent.setLeft(mostLeft.getRight());
-        mostLeft.setRight(removableNode.getRight());
+
         mostLeft.setLeft(removableNode.getLeft());
 
         if (removableNodeParent == null) {

@@ -7,15 +7,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 
-public class Window {
-    Scale[] scales;
-    Converter converter;
-
-    public Window(Scale[] scales, Converter converter) {
-        this.scales = scales;
-        this.converter = converter;
-    }
-
+public record Window(Scale[] scales, Converter converter) {
     public void start() {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = getFrame();
@@ -38,9 +30,8 @@ public class Window {
             outputField.setBorder(new TitledBorder("Result"));
             outputField.setEditable(false);
 
-            JButton convertButton = new JButton("convert");
+            JButton convertButton = new JButton("Convert");
             convertButton.setBorderPainted(true);
-            convertButton.setBorder(new TitledBorder("Convert"));
             convertButton.setFocusPainted(false);
 
             convertButton.addActionListener(e -> {
@@ -57,12 +48,11 @@ public class Window {
                     try {
                         double numberFromTextField = Double.parseDouble(inputField.getText());
                         double result = converter.convert(fromScale, toScale, numberFromTextField);
-                        double roundResult = Math.round(result * 100.0) / 100.0;
+                        String roundResult = String.format("%.2f", result);
 
-                        outputField.setText(Double.toString(roundResult));
+                        outputField.setText(roundResult);
                     } catch (NumberFormatException exception) {
                         JOptionPane.showMessageDialog(frame, "Not a number.", "Error", JOptionPane.INFORMATION_MESSAGE);
-                        inputField.setText("");
                     }
                 }
             });
@@ -72,30 +62,29 @@ public class Window {
             frame.add(toBox);
             frame.add(convertButton);
             frame.add(outputField);
-
             frame.setVisible(true);
         });
     }
 
     private JFrame getFrame() {
-        JFrame jFrame = new JFrame("Temperature converter");
+        JFrame frame = new JFrame("Temperature converter");
 
         Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
         int defaultWidth = 430;
         int defaultHeight = 350;
-        jFrame.setBounds(screenDimension.width / 2 - defaultWidth / 2, screenDimension.height / 2 - defaultHeight / 2, defaultWidth, defaultHeight);
+        frame.setBounds(screenDimension.width / 2 - defaultWidth / 2, screenDimension.height / 2 - defaultHeight / 2, defaultWidth, defaultHeight);
 
         Dimension minDimension = new Dimension(defaultWidth / 2, (int) (defaultHeight * 0.8));
-        jFrame.setMinimumSize(minDimension);
+        frame.setMinimumSize(minDimension);
 
-        jFrame.setAlwaysOnTop(true);
-        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setAlwaysOnTop(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         GridLayout gridLayout = new GridLayout();
         gridLayout.setColumns(1);
         gridLayout.setRows(5);
-        jFrame.setLayout(gridLayout);
+        frame.setLayout(gridLayout);
 
-        return jFrame;
+        return frame;
     }
 }

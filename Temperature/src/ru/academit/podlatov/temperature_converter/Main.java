@@ -7,10 +7,12 @@ import ru.academit.podlatov.temperature_converter.model.scales.KelvinScale;
 import ru.academit.podlatov.temperature_converter.model.scales.Scale;
 import ru.academit.podlatov.temperature_converter.view.Window;
 
-
 public class Main {
     public static void main(String[] args) {
-        Window window = new Window(new Scale[]{new CelsiusScale(), new FahrenheitScale(), new KelvinScale()}, new Converter());
+        Scale[] scales = new Scale[]{new CelsiusScale(), new FahrenheitScale(), new KelvinScale()};
+        Converter converter = new Converter();
+
+        Window window = new Window(scales, converter);
         window.start();
     }
 }

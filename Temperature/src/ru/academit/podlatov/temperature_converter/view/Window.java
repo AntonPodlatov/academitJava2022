@@ -70,7 +70,7 @@ public record Window(Scale[] scales, Converter converter) {
         JFrame frame = new JFrame("Temperature converter");
 
         Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
-        int defaultWidth = 430;
+        int defaultWidth = 435;
         int defaultHeight = 350;
         frame.setBounds(screenDimension.width / 2 - defaultWidth / 2, screenDimension.height / 2 - defaultHeight / 2, defaultWidth, defaultHeight);
 

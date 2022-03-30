@@ -69,7 +69,6 @@ public class CsvToHtml {
 
                         if (currentChar == comma && i < lastIndex && line.charAt(i + 1) != quote) {
                             writer.print(cellEndAndStart);
-                            //   i++;
                             continue;
                         }
                     } else {

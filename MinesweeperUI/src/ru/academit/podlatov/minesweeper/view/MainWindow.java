@@ -103,11 +103,14 @@ public class MainWindow {
                     public void mousePressed(MouseEvent e) {
                         super.mouseClicked(e);
 
-                        timerLabel.startTimer();
+                        if (cellButton.isEnabled()){
+                            timerLabel.startTimer();
+                        }
+                        
                         model.openCell(finalX, finalY);
                         cellButton.setFocusPainted(false);
 
-                        if (cellButton.isEnabled()){
+                        if (cellButton.isEnabled()) {
                             if (model.isWin()) {
                                 timerLabel.stopTimer();
                                 System.out.println(timerLabel.getTimerValueInSeconds());

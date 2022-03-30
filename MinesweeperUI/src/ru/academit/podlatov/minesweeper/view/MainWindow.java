@@ -106,7 +106,7 @@ public class MainWindow {
                         if (cellButton.isEnabled()){
                             timerLabel.startTimer();
                         }
-                        
+
                         model.openCell(finalX, finalY);
                         cellButton.setFocusPainted(false);
 

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScoresLoaderAndWriter {
-    private final static String filePath = "MinesweeperAt4/src/ru/academit/podlatov/minesweeper/scoresData.txt";
+    private final static String filePath = "MinesweeperUI/src/ru/academit/podlatov/minesweeper/model/scoresData.txt";
     private List<String> list = new ArrayList<>();
 
     public ScoresLoaderAndWriter() {

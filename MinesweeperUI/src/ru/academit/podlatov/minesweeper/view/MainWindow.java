@@ -177,8 +177,8 @@ public class MainWindow {
                             button.setText("");
                         }
                     } else {
-                        buttons[y][x].setIcon(new ImageIcon("MinesweeperAt4/src/ru/academit/podlatov/minesweeper/resources/mine.png"));
-                        buttons[y][x].setDisabledIcon(new ImageIcon("MinesweeperAt4/src/ru/academit/podlatov/minesweeper/resources/mine.png"));
+                        buttons[y][x].setIcon(new ImageIcon("MinesweeperUI/src/ru/academit/podlatov/minesweeper/resources/mine.png"));
+                        buttons[y][x].setDisabledIcon(new ImageIcon("MinesweeperUI/src/ru/academit/podlatov/minesweeper/resources/mine.png"));
                     }
 
                     buttons[y][x].setEnabled(false);

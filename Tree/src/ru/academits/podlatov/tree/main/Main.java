@@ -24,6 +24,7 @@ public class Main {
         tree1.traverseForBreadth(System.out::println);
 
         tree1.remove(1.0);
+        tree1.insert(100.0);
         System.out.println();
         tree1.traverseForBreadth(System.out::println);
 

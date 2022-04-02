@@ -202,9 +202,7 @@ public class Tree<T> {
             return;
         }
 
-        if (root.has2Children()) {
-            removeNodeWith2Children(root, null);
-        }
+        removeNodeWith2Children(root, null);
     }
 
     private void removeNodeWith2Children(Node<T> removableNode, Node<T> removableNodeParent) {

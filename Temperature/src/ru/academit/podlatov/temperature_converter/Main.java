@@ -9,7 +9,7 @@ import ru.academit.podlatov.temperature_converter.view.Window;
 
 public class Main {
     public static void main(String[] args) {
-        Scale[] scales = new Scale[]{new CelsiusScale(), new FahrenheitScale(), new KelvinScale()};
+        Scale[] scales = {new CelsiusScale(), new FahrenheitScale(), new KelvinScale()};
         Converter converter = new Converter();
 
         Window window = new Window(scales, converter);

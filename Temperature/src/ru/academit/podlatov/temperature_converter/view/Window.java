@@ -41,16 +41,16 @@ public record Window(Scale[] scales, Converter converter) {
                 if (inputField.getText().isEmpty() || fromScale == null || toScale == null) {
                     JOptionPane.showMessageDialog(frame, "Specify all inputs.", "Error", JOptionPane.INFORMATION_MESSAGE);
                 } else if (inputField.getText().contains(",")) {
-                    JOptionPane.showMessageDialog(frame, "Wrong number format.\nUse a dot instead of a comma as the decimal separator.",
+                    JOptionPane.showMessageDialog(frame, "Wrong number format." + System.lineSeparator() + "Use a dot instead of a comma as the decimal separator.",
                             "Error", JOptionPane.INFORMATION_MESSAGE);
                     inputField.setText("");
                 } else {
                     try {
                         double numberFromTextField = Double.parseDouble(inputField.getText());
                         double result = converter.convert(fromScale, toScale, numberFromTextField);
-                        String roundResult = String.format("%.2f", result);
+                        String roundedResult = String.format("%.2f", result);
 
-                        outputField.setText(roundResult);
+                        outputField.setText(roundedResult);
                     } catch (NumberFormatException exception) {
                         JOptionPane.showMessageDialog(frame, "Not a number.", "Error", JOptionPane.INFORMATION_MESSAGE);
                     }

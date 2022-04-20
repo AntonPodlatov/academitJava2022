@@ -32,7 +32,7 @@ public class Model {
 
         layMines(sideLength);
         countAndSetMinesCountAroundMines(sideLength);
-
+/*
         for (int i = 0; i < sideLength; i++) {
             for (int j = 0; j < sideLength; j++) {
                 if (matrix[i][j].isMine()) {
@@ -44,6 +44,7 @@ public class Model {
             System.out.println();
             System.out.println();
         }
+  */
     }
 
     private void layMines(int sideLength) {

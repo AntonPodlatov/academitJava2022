@@ -1,6 +1,7 @@
 package ru.academit.podlatov.minesweeper.model;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Model {
     private int minesCount;
@@ -25,12 +26,12 @@ public class Model {
 
         for (int i = 0; i < sideLength; i++) {
             for (int j = 0; j < sideLength; j++) {
-                matrix[i][j] = new Cell(i, j);
+                matrix[i][j] = new Cell();
             }
         }
 
         layMines(sideLength);
-        countAndSetMinesAround(sideLength);
+        countAndSetMinesCountAroundMines(sideLength);
 
         for (int i = 0; i < sideLength; i++) {
             for (int j = 0; j < sideLength; j++) {
@@ -46,9 +47,11 @@ public class Model {
     }
 
     private void layMines(int sideLength) {
+        Random random = new Random();
+
         for (int i = 0; i < minesCount; i++) {
-            int locationYAxis = (int) (Math.random() * sideLength);
-            int locationXAxis = (int) (Math.random() * sideLength);
+            int locationYAxis = random.nextInt(sideLength);
+            int locationXAxis = random.nextInt(sideLength);
 
             if (!matrix[locationXAxis][locationYAxis].isMine()) {
                 matrix[locationXAxis][locationYAxis].makeMine();
@@ -58,44 +61,44 @@ public class Model {
         }
     }
 
-    private void countAndSetMinesAround(int sideLength) {
+    private void countAndSetMinesCountAroundMines(int sideLength) {
         for (int x = 0; x < sideLength; x++) {
             for (int y = 0; y < sideLength; y++) {
                 if (!matrix[x][y].isMine()) {
-                    int bombsCountAround = 0;
+                    int minesCountAround = 0;
 
                     if (x > 0 && y > 0 && matrix[x - 1][y - 1].isMine()) {
-                        bombsCountAround++;
+                        minesCountAround++;
                     }
 
                     if (y > 0 && matrix[x][y - 1].isMine()) {
-                        bombsCountAround++;
+                        minesCountAround++;
                     }
 
                     if (y < sideLength - 1 && matrix[x][y + 1].isMine()) {
-                        bombsCountAround++;
+                        minesCountAround++;
                     }
 
                     if (x < sideLength - 1 && y > 0 && matrix[x + 1][y - 1].isMine()) {
-                        bombsCountAround++;
+                        minesCountAround++;
                     }
 
                     if (x > 0 && matrix[x - 1][y].isMine()) {
-                        bombsCountAround++;
+                        minesCountAround++;
                     }
 
                     if (x < sideLength - 1 && matrix[x + 1][y].isMine()) {
-                        bombsCountAround++;
+                        minesCountAround++;
                     }
 
                     if (x > 0 && y < sideLength - 1 && matrix[x - 1][y + 1].isMine()) {
-                        bombsCountAround++;
+                        minesCountAround++;
                     }
 
                     if (x < sideLength - 1 && y < sideLength - 1 && matrix[x + 1][y + 1].isMine()) {
-                        bombsCountAround++;
+                        minesCountAround++;
                     }
-                    matrix[x][y].setMinesCountAround(bombsCountAround);
+                    matrix[x][y].setMinesCountAround(minesCountAround);
                 }
             }
         }
@@ -133,103 +136,170 @@ public class Model {
         return isWin;
     }
 
-    public void clearArea(ArrayList<Integer> forClear) {
-        if (forClear.isEmpty()) {
+    public void openAllZerosAndNeighboringOtherNumbers(ArrayList<Integer> cellsForOpening, ArrayList<Integer> visitedCells) {
+        if (cellsForOpening.isEmpty()) {
             return;
         }
 
-        int x = forClear.get(0) / 100;
-        int y = forClear.get(0) % 100;
-        forClear.remove(0);
+        int x = cellsForOpening.get(0) / 100;
+        int y = cellsForOpening.get(0) % 100;
+        Integer lastRemoved = cellsForOpening.remove(0);
+        visitedCells.add(lastRemoved);
 
-        if (matrix[x][y].getMinesCountAround() == 0) {
-            if (x > 0 && y > 0 && matrix[x - 1][y - 1].isClosed()) {
+        if (x > 0 && y > 0 && matrix[x - 1][y - 1].isClosed()) {
+            if (!matrix[x - 1][y - 1].isFlagged() && !matrix[x - 1][y - 1].isQuestioned()) {
                 matrix[x - 1][y - 1].open();
                 openedCount++;
+            }
 
-                if (matrix[x - 1][y - 1].getMinesCountAround() == 0) {
-                    forClear.add((x - 1) * 100 + (y - 1));
+            if (matrix[x - 1][y - 1].getMinesCountAround() == 0) {
+                int cellLocation = (x - 1) * 100 + (y - 1);
+
+                if (!cellsForOpening.contains(cellLocation)) {
+                    if (!visitedCells.contains(cellLocation)) {
+                        cellsForOpening.add(cellLocation);
+                    }
                 }
             }
         }
 
         if (y > 0 && matrix[x][y - 1].isClosed()) {
-            matrix[x][y - 1].open();
-            openedCount++;
+            if (!matrix[x][y - 1].isFlagged() && !matrix[x][y - 1].isQuestioned()) {
+                matrix[x][y - 1].open();
+                openedCount++;
+            }
 
             if (matrix[x][y - 1].getMinesCountAround() == 0) {
-                forClear.add(x * 100 + (y - 1));
+                int cellLocation = x * 100 + (y - 1);
+
+                if (!cellsForOpening.contains(cellLocation)) {
+                    if (!visitedCells.contains(cellLocation)) {
+                        cellsForOpening.add(cellLocation);
+                    }
+                }
             }
         }
 
-        if (y < matrix.length - 1 && matrix[x][y + 1].isClosed()) {
-            matrix[x][y + 1].open();
-            openedCount++;
+        if (y < sideLength - 1 && matrix[x][y + 1].isClosed()) {
+            if (!matrix[x][y + 1].isFlagged() && !matrix[x][y + 1].isQuestioned()) {
+                matrix[x][y + 1].open();
+                openedCount++;
+            }
 
             if (matrix[x][y + 1].getMinesCountAround() == 0) {
-                forClear.add(x * 100 + (y + 1));
+                int cellLocation = x * 100 + (y + 1);
+
+                if (!cellsForOpening.contains(cellLocation)) {
+                    if (!visitedCells.contains(cellLocation)) {
+                        cellsForOpening.add(cellLocation);
+                    }
+                }
             }
         }
 
-        if (x < matrix.length - 1 && y > 0 && matrix[x + 1][y - 1].isClosed()) {
-            matrix[x + 1][y - 1].open();
-            openedCount++;
+        if (x < sideLength - 1 && y > 0 && matrix[x + 1][y - 1].isClosed()) {
+            if (!matrix[x + 1][y - 1].isFlagged() && !matrix[x + 1][y - 1].isQuestioned()) {
+                matrix[x + 1][y - 1].open();
+                openedCount++;
+            }
 
             if (matrix[x + 1][y - 1].getMinesCountAround() == 0) {
-                forClear.add((x + 1) * 100 + (y - 1));
+                int cellLocation = (x + 1) * 100 + (y - 1);
+
+                if (!cellsForOpening.contains(cellLocation)) {
+                    if (!visitedCells.contains(cellLocation)) {
+                        cellsForOpening.add(cellLocation);
+                    }
+                }
             }
         }
 
         if (x > 0 && matrix[x - 1][y].isClosed()) {
-            matrix[x - 1][y].open();
-            openedCount++;
+            if (!matrix[x - 1][y].isFlagged() && !matrix[x - 1][y].isQuestioned()) {
+                matrix[x - 1][y].open();
+                openedCount++;
+            }
 
             if (matrix[x - 1][y].getMinesCountAround() == 0) {
-                forClear.add((x - 1) * 100 + y);
+                int cellLocation = (x - 1) * 100 + y;
+
+                if (!cellsForOpening.contains(cellLocation)) {
+                    if (!visitedCells.contains(cellLocation)) {
+                        cellsForOpening.add(cellLocation);
+                    }
+                }
             }
         }
 
-        if (x < matrix.length - 1 && matrix[x + 1][y].isClosed()) {
-            matrix[x + 1][y].open();
-            openedCount++;
+        if (x < sideLength - 1 && matrix[x + 1][y].isClosed()) {
+            if (!matrix[x + 1][y].isFlagged() && !matrix[x + 1][y].isQuestioned()) {
+                matrix[x + 1][y].open();
+                openedCount++;
+            }
 
             if (matrix[x + 1][y].getMinesCountAround() == 0) {
-                forClear.add((x + 1) * 100 + y);
+                int cellLocation = (x + 1) * 100 + y;
+
+                if (!cellsForOpening.contains(cellLocation)) {
+                    if (!visitedCells.contains(cellLocation)) {
+                        cellsForOpening.add(cellLocation);
+                    }
+                }
             }
         }
 
-        if (x > 0 && y < matrix.length - 1 && matrix[x - 1][y + 1].isClosed()) {
-            matrix[x - 1][y + 1].open();
-            openedCount++;
+        if (x > 0 && y < sideLength - 1 && matrix[x - 1][y + 1].isClosed()) {
+            if (!matrix[x - 1][y + 1].isFlagged() && !matrix[x - 1][y + 1].isQuestioned()) {
+                matrix[x - 1][y + 1].open();
+                openedCount++;
+            }
 
             if (matrix[x - 1][y + 1].getMinesCountAround() == 0) {
-                forClear.add((x - 1) * 100 + (y + 1));
+                int cellLocation = (x - 1) * 100 + (y + 1);
+
+                if (!cellsForOpening.contains(cellLocation)) {
+                    if (!visitedCells.contains(cellLocation)) {
+                        cellsForOpening.add(cellLocation);
+                    }
+                }
             }
         }
 
-        if (x < matrix.length - 1 && y < matrix.length - 1 && matrix[x + 1][y + 1].isClosed()) {
-            matrix[x + 1][y + 1].open();
-            openedCount++;
+        if (x < sideLength - 1 && y < sideLength - 1 && matrix[x + 1][y + 1].isClosed()) {
+            if (!matrix[x + 1][y + 1].isFlagged() && !matrix[x + 1][y + 1].isQuestioned()) {
+                matrix[x + 1][y + 1].open();
+                openedCount++;
+            }
 
             if (matrix[x + 1][y + 1].getMinesCountAround() == 0) {
-                forClear.add((x + 1) * 100 + (y + 1));
+                int cellLocation = (x + 1) * 100 + (y + 1);
+
+                if (!cellsForOpening.contains(cellLocation)) {
+                    if (!visitedCells.contains(cellLocation)) {
+                        cellsForOpening.add(cellLocation);
+                    }
+                }
             }
         }
 
-        clearArea(forClear);
+        openAllZerosAndNeighboringOtherNumbers(cellsForOpening, visitedCells);
+
     }
 
     public void openCell(int x, int y) {
         if (matrix[x][y].isMine()) {
             isGameOver = true;
-        } else if (matrix[x][y].getMinesCountAround() == 0) {
+        } else if (matrix[x][y].getMinesCountAround() == 0 && !matrix[x][y].isFlagged() && !matrix[x][y].isQuestioned()) {
             matrix[x][y].open();
             openedCount++;
 
-            ArrayList<Integer> forClear = new ArrayList<>();
-            forClear.add(x * 100 + y);
+            if (matrix[x][y].getMinesCountAround() == 0) {
+                ArrayList<Integer> cellsForOpening = new ArrayList<>();
+                cellsForOpening.add(x * 100 + y);
 
-            clearArea(forClear);
+                ArrayList<Integer> visitedCells = new ArrayList<>();
+                openAllZerosAndNeighboringOtherNumbers(cellsForOpening, visitedCells);
+            }
 
             if (openedCount == sideLength * sideLength - minesCount) {
                 isWin = true;
@@ -244,7 +314,27 @@ public class Model {
         }
     }
 
-    public void stopGame() {
-        isGameOver = true;
+    public void setFlag(int x, int y) {
+        matrix[x][y].makeFlagged();
+    }
+
+    public void setQuestion(int x, int y) {
+        matrix[x][y].makeQuestioned();
+    }
+
+    public void removeFlag(int x, int y) {
+        matrix[x][y].removeFlag();
+    }
+
+    public void removeQuestion(int x, int y) {
+        matrix[x][y].removeQuestion();
+    }
+
+    public boolean isFlag(int x, int y) {
+        return matrix[x][y].isFlagged();
+    }
+
+    public boolean isQuestion(int x, int y) {
+        return matrix[x][y].isQuestioned();
     }
 }

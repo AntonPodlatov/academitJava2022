@@ -1,22 +1,48 @@
 package ru.academit.podlatov.minesweeper.view;
 
 import ru.academit.podlatov.minesweeper.model.Cell;
+import ru.academit.podlatov.minesweeper.model.GameTimer;
 import ru.academit.podlatov.minesweeper.model.Model;
 import ru.academit.podlatov.minesweeper.view.secondary_visual_elements.*;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 
 public class MainWindow {
     private Model model;
     private JButton[][] buttons;
     private Container buttonsGrid;
-    private TimerLabel timerLabel;
+    private GameTimer gameTimer;
+    private JLabel timerLabel;
+    private final ImageIcon mineIcon;
+    private final ImageIcon flagIcon;
+    private final ImageIcon questionIcon;
+    private final ImageIcon notMineIcon;
+    private final ImageIcon emptyCellIcon;
+    private final ImageIcon[] numbersIcons;
 
     public MainWindow(Model model) {
         this.model = model;
+
+        mineIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/mine.png")));
+        notMineIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/notMine.png")));
+        flagIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/flag.png")));
+        questionIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/question.png")));
+        emptyCellIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/emptyCell.png")));
+
+        numbersIcons = new ImageIcon[8];
+        numbersIcons[0] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/1.png")));
+        numbersIcons[1] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/2.png")));
+        numbersIcons[2] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/3.png")));
+        numbersIcons[3] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/4.png")));
+        numbersIcons[4] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/5.png")));
+        numbersIcons[5] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/6.png")));
+        numbersIcons[6] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/7.png")));
+        numbersIcons[7] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/8.png")));
     }
 
     public void start() {
@@ -28,9 +54,10 @@ public class MainWindow {
             frame.setMinimumSize(minDimension);
             setFrameSize(frame);
 
-            JButton newGameButton = new JButton("new game");
+            JButton newGameButton = new JButton("New game");
             newGameButton.addActionListener(e -> {
-                timerLabel.resetTimer();
+                gameTimer.resetTimer();
+                timerLabel.setText(gameTimer.getGameTimeString());
                 model = new Model(model.getMinesCount(), model.getSideLength());
                 frame.remove(buttonsGrid);
                 generateCellGrid(frame);
@@ -38,26 +65,29 @@ public class MainWindow {
                 frame.validate();
             });
 
-            JButton aboutButton = new JButton("about");
+            JButton aboutButton = new JButton("About");
             aboutButton.addActionListener(e -> {
                 AboutWindow aboutWindow = new AboutWindow(frame);
-                aboutWindow.setVisible(true);
+                aboutWindow.getJDialog().setVisible(true);
             });
 
-            JButton scoresButton = new JButton("high scores");
+            JButton scoresButton = new JButton("High scores");
             scoresButton.addActionListener(e -> {
                 ScoresWindow scoresWindow = new ScoresWindow(frame);
-                scoresWindow.setVisible(true);
+                scoresWindow.getJDialog().setVisible(true);
             });
 
-            JButton settingsButton = new JButton("settings");
+            JButton settingsButton = new JButton("Settings");
             settingsButton.addActionListener(e -> {
                 SettingsDialogWindow settingsDialogWindow = new SettingsDialogWindow(frame, model);
-                settingsDialogWindow.setVisible(true);
-
+                settingsDialogWindow.getJDialog().setVisible(true);
             });
 
-            timerLabel = new TimerLabel();
+            gameTimer = new GameTimer();
+            timerLabel = new JLabel();
+            timerLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+            timerLabel.setText(gameTimer.getGameTimeString());
+            gameTimer.addPropertyChangeListener(evt -> timerLabel.setText(gameTimer.getGameTimeString()));
 
             JPanel buttonPanel = new JPanel();
             buttonPanel.add(newGameButton);
@@ -103,31 +133,39 @@ public class MainWindow {
                     public void mousePressed(MouseEvent e) {
                         super.mouseClicked(e);
 
-                        if (cellButton.isEnabled()){
-                            timerLabel.startTimer();
-                        }
-
-                        model.openCell(finalX, finalY);
-                        cellButton.setFocusPainted(false);
-
                         if (cellButton.isEnabled()) {
-                            if (model.isWin()) {
-                                timerLabel.stopTimer();
-                                System.out.println(timerLabel.getTimerValueInSeconds());
-                                showAllField();
-                                InputNameDialog inputNameDialog = new InputNameDialog(frame, timerLabel);
-                                inputNameDialog.setVisible(true);
-                            }
-
-                            if (model.isGameOver()) {
-                                timerLabel.stopTimer();
-                                //System.out.println(timerLabel.getTimerValueInSeconds());
-                                showAllField();
-                                JOptionPane.showMessageDialog(frame, "Explosion!", "Game Over", JOptionPane.ERROR_MESSAGE);
-                            }
+                            gameTimer.startTimer();
                         }
 
-                        synchronize();
+                        if (SwingUtilities.isLeftMouseButton(e)) {
+                            if (cellButton.isEnabled()) {
+                                model.openCell(finalX, finalY);
+                                cellButton.setFocusPainted(false);
+
+                                if (model.isWin()) {
+                                    gameTimer.stopTimer();
+                                    showAllField();
+                                    InputNameDialog inputNameDialog = new InputNameDialog(frame, gameTimer);
+                                    inputNameDialog.getJDialog().setVisible(true);
+                                } else if (model.isGameOver()) {
+                                    gameTimer.stopTimer();
+                                    showAllField();
+                                    JOptionPane.showMessageDialog(frame, "Explosion!", "Game Over", JOptionPane.ERROR_MESSAGE);
+                                } else {
+                                    synchronize();
+                                }
+                            }
+                        } else if (SwingUtilities.isRightMouseButton(e)) {
+                            if (!model.isFlag(finalX, finalY) && !model.isQuestion(finalX, finalY)) {
+                                model.setFlag(finalX, finalY);
+                            } else if (model.isFlag(finalX, finalY) && !model.isQuestion(finalX, finalY)) {
+                                model.removeFlag(finalX, finalY);
+                                model.setQuestion(finalX, finalY);
+                            } else if (!model.isFlag(finalX, finalY) && model.isQuestion(finalX, finalY)) {
+                                model.removeQuestion(finalX, finalY);
+                            }
+                            synchronize();
+                        }
                     }
                 });
 
@@ -150,10 +188,27 @@ public class MainWindow {
                     button.setEnabled(false);
 
                     if (cell.getMinesCountAround() > 0) {
-                        button.setText(String.valueOf(cell.getMinesCountAround()));
+                        button.setIcon(numbersIcons[cell.getMinesCountAround() - 1]);
+                        button.setDisabledIcon(numbersIcons[cell.getMinesCountAround() - 1]);
                     }
 
                     if (cell.getMinesCountAround() == 0) {
+                        button.setIcon(emptyCellIcon);
+                        button.setDisabledIcon(emptyCellIcon);
+                    }
+                } else {
+                    if (cell.isFlagged()) {
+                        button.setEnabled(false);
+                        button.setIcon(flagIcon);
+                        button.setDisabledIcon(flagIcon);
+                    } else if (cell.isQuestioned()) {
+                        button.setEnabled(false);
+                        button.setIcon(questionIcon);
+                        button.setDisabledIcon(questionIcon);
+                    } else if (!cell.isQuestioned() && !cell.isFlagged()) {
+                        button.setEnabled(true);
+                        button.setIcon(null);
+                        button.setDisabledIcon(null);
                         button.setText("");
                     }
                 }
@@ -167,24 +222,36 @@ public class MainWindow {
         for (int y = 0; y < sideLength; y++) {
             for (int x = 0; x < sideLength; x++) {
                 JButton button = buttons[y][x];
+                Cell cell = model.getCell(y, x);
 
-                if (button.isEnabled()) {
-                    if (!model.getCell(y, x).isMine()) {
-                        Cell cell = model.getCell(y, x);
-
-                        if (cell.getMinesCountAround() > 0) {
-                            button.setText(String.valueOf(cell.getMinesCountAround()));
+                if (cell.isFlagged()) {
+                    if (cell.isMine()) {
+                        if (cell.isQuestioned()) {
+                            continue;
                         }
 
-                        if (cell.getMinesCountAround() == 0) {
-                            button.setText("");
-                        }
+                        button.setIcon(flagIcon);
+                        button.setDisabledIcon(flagIcon);
+
+                        cell.open();
+                        button.setEnabled(false);
                     } else {
-                        buttons[y][x].setIcon(new ImageIcon("MinesweeperUI/src/ru/academit/podlatov/minesweeper/resources/mine.png"));
-                        buttons[y][x].setDisabledIcon(new ImageIcon("MinesweeperUI/src/ru/academit/podlatov/minesweeper/resources/mine.png"));
+                        button.setIcon(notMineIcon);
+                        button.setDisabledIcon(notMineIcon);
+                    }
+                } else {
+                    if (cell.isMine()) {
+                        if (cell.isQuestioned()) {
+                            continue;
+                        }
+
+                        button.setIcon(mineIcon);
+                        button.setDisabledIcon(mineIcon);
+                        cell.open();
+                        button.setEnabled(false);
                     }
 
-                    buttons[y][x].setEnabled(false);
+                    button.setEnabled(false);
                 }
             }
         }

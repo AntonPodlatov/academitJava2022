@@ -1,76 +1,92 @@
 package ru.academit.podlatov.minesweeper.model;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ScoresLoaderAndWriter {
-    private final static String filePath = "MinesweeperUI/src/ru/academit/podlatov/minesweeper/model/scoresData.txt";
-    private List<String> list = new ArrayList<>();
+    private final String filePath;
+    private List<ScoreRecord> scoresList = new ArrayList<>();
 
-    public ScoresLoaderAndWriter() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
+    public ScoresLoaderAndWriter() throws IOException {
+        filePath = getPath() + "scoresData.bin";
+        File file = new File(filePath);
 
-            while ((line = reader.readLine()) != null) {
-                list.add(line);
-            }
-
-            sortList();
-
-            list.forEach(System.out::println);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!file.isFile()) {
+            //noinspection ResultOfMethodCallIgnored
+            file.createNewFile();
         }
+
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
+            ScoreRecord scoreRecord;
+
+            while ((scoreRecord = (ScoreRecord) objectInputStream.readObject()) != null) {
+                scoresList.add(scoreRecord);
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (EOFException ignored) {
+        }
+
+
     }
 
     public void sortList() {
-        list.sort((s1, s2) -> {
-            int s1Number = Integer.parseInt(s1, 0, s1.indexOf(","), 10);
-            int s2Number = Integer.parseInt(s2, 0, s2.indexOf(","), 10);
+        scoresList.sort((s1, s2) -> {
+            int s1Number = s1.getSecondsCount();
+            int s2Number = s2.getSecondsCount();
             return Integer.compare(s1Number, s2Number);
         });
     }
 
-    public List<String> getList() {
-        return list;
+    public List<ScoreRecord> getScoresList() {
+        return scoresList;
     }
 
     public void trimToSize10() {
-        if (list.size() < 10) {
+        if (scoresList.size() < 10) {
             return;
         }
 
-        list = list.subList(0, 10);
+        scoresList = scoresList.subList(0, 10);
     }
 
-    public String getScoreFromLine(String line) {
-        return line.split(",", 0)[0];
-    }
-
-    public String getNameFromLine(String line) {
-        return line.split(",", 2)[1];
-    }
-
-    public void replaceAllData() {
-        File file = new File(filePath);
-        boolean isDeleted = file.delete();
-
-        try (PrintWriter printWriter = new PrintWriter(filePath)) {
-            list.forEach(printWriter::println);
+    private void replaceAllData() {
+        try (ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(filePath))) {
+            for (ScoreRecord scoreRecord : getScoresList()) {
+                stream.writeObject(scoreRecord);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void addToList(String name, String score) {
-        list.add(score + "," + name);
+    public void addToList(ScoreRecord scoreRecord) {
+        scoresList.add(scoreRecord);
     }
 
-    public  void writeScore(String name, String score) {
-        addToList(name, score);
+    public void writeScore(ScoreRecord scoreRecord) throws FileNotFoundException {
+        addToList(scoreRecord);
         sortList();
         trimToSize10();
         replaceAllData();
+    }
+
+    private String getPath() {
+        String path = null;
+
+        try {
+            path = getClass()
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI()
+                    .getPath();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return path;
     }
 }

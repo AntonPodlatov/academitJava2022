@@ -1,17 +1,17 @@
 package ru.academit.podlatov.minesweeper.model;
 
 public class Cell {
-    private final int columnNumber;
-    private final int rowNumber;
     private int minesCountAround;
     private boolean isClosed;
     private boolean isMine;
+    private boolean isFlagged;
+    private boolean isQuestioned;
 
-    public Cell(int rowNumber, int columnNumber) {
-        this.rowNumber = rowNumber;
-        this.columnNumber = columnNumber;
+    public Cell() {
         isMine = false;
         isClosed = true;
+        isFlagged = false;
+        isQuestioned = false;
     }
 
     public boolean isMine() {
@@ -39,14 +39,27 @@ public class Cell {
         return minesCountAround;
     }
 
-    @Override
-    public String toString() {
-        return "Cell{" +
-                ", rowNumber=" + rowNumber +
-                ", columnNumber=" + columnNumber +
-                ", minesCountAround=" + minesCountAround +
-                ", isClosed=" + isClosed +
-                ", isMine=" + isMine +
-                '}';
+    public void makeFlagged() {
+        isFlagged = true;
+    }
+
+    public void makeQuestioned() {
+        isQuestioned = true;
+    }
+
+    public boolean isFlagged() {
+        return isFlagged;
+    }
+
+    public boolean isQuestioned() {
+        return isQuestioned;
+    }
+
+    public void removeFlag() {
+        isFlagged = false;
+    }
+
+    public void removeQuestion() {
+        isQuestioned = false;
     }
 }

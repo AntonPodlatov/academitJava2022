@@ -24,9 +24,7 @@ public class ScoresLoaderAndWriter {
             while ((scoreRecord = (ScoreRecord) objectInputStream.readObject()) != null) {
                 scoresList.add(scoreRecord);
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (EOFException ignored) {
+        } catch (ClassNotFoundException | EOFException ignored) {
         }
 
 
@@ -52,13 +50,11 @@ public class ScoresLoaderAndWriter {
         scoresList = scoresList.subList(0, 10);
     }
 
-    private void replaceAllData() {
+    private void replaceAllData() throws IOException {
         try (ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(filePath))) {
             for (ScoreRecord scoreRecord : getScoresList()) {
                 stream.writeObject(scoreRecord);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -66,7 +62,7 @@ public class ScoresLoaderAndWriter {
         scoresList.add(scoreRecord);
     }
 
-    public void writeScore(ScoreRecord scoreRecord) throws FileNotFoundException {
+    public void writeScore(ScoreRecord scoreRecord) throws IOException {
         addToList(scoreRecord);
         sortList();
         trimToSize10();

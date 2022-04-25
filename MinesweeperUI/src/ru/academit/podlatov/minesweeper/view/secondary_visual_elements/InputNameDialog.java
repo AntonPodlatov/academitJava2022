@@ -10,6 +10,7 @@ import java.awt.*;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class InputNameDialog {
@@ -63,12 +64,13 @@ public class InputNameDialog {
 
                 try {
                     writer = new ScoresLoaderAndWriter();
-                    ScoreRecord scoreRecord = new ScoreRecord(score,name);
+                    ScoreRecord scoreRecord = new ScoreRecord(score, name);
                     writer.writeScore(scoreRecord);
-                } catch (IOException ex) {
+                } catch (FileNotFoundException e2) {
                     JOptionPane.showMessageDialog(frame, "The file for writing data is not found.", "Error", JOptionPane.INFORMATION_MESSAGE);
+                } catch (IOException e1) {
+                    JOptionPane.showMessageDialog(frame, "Writing error.", "Error", JOptionPane.INFORMATION_MESSAGE);
                 }
-
                 jDialog.dispose();
             }
         });

@@ -23,6 +23,8 @@ public class ScoresWindow {
         try {
             scoresLoader = new ScoresLoaderAndWriter();
         } catch (IOException e) {
+            JOptionPane.showMessageDialog(frame, "Data read error.", "Error", JOptionPane.INFORMATION_MESSAGE);
+
             e.printStackTrace();
         }
 

@@ -32,7 +32,7 @@ public class Model {
 
         layMines(sideLength);
         countAndSetMinesCountAroundMines(sideLength);
-/*
+
         for (int i = 0; i < sideLength; i++) {
             for (int j = 0; j < sideLength; j++) {
                 if (matrix[i][j].isMine()) {
@@ -44,7 +44,7 @@ public class Model {
             System.out.println();
             System.out.println();
         }
-  */
+
     }
 
     private void layMines(int sideLength) {
@@ -337,5 +337,81 @@ public class Model {
 
     public boolean isQuestion(int x, int y) {
         return matrix[x][y].isQuestioned();
+    }
+
+    public ArrayList<Cell> getNeighbouringCells(int x, int y) {
+        ArrayList<Cell> cells = new ArrayList<>();
+
+        if (x > 0 && y > 0) {
+            cells.add(matrix[x - 1][y - 1]);
+        }
+
+        if (y > 0) {
+            cells.add(matrix[x][y - 1]);
+        }
+
+        if (y < sideLength - 1) {
+            cells.add(matrix[x][y + 1]);
+        }
+
+        if (x < sideLength - 1 && y > 0) {
+            cells.add(matrix[x + 1][y - 1]);
+        }
+
+        if (x > 0) {
+            cells.add(matrix[x - 1][y]);
+        }
+
+        if (x < sideLength - 1) {
+            cells.add(matrix[x + 1][y]);
+        }
+
+        if (x > 0 && y < sideLength - 1) {
+            cells.add(matrix[x - 1][y + 1]);
+        }
+
+        if (x < sideLength - 1 && y < sideLength - 1) {
+            cells.add(matrix[x + 1][y + 1]);
+        }
+
+        return cells;
+    }
+
+    public boolean isRightFlagged(ArrayList<Cell> cells) {
+        boolean containsMines = false;
+
+        for (Cell cell : cells) {
+            if (cell.isMine()) {
+                containsMines = true;
+
+                if (!cell.isFlagged()) {
+                    return false;
+                }
+            }
+            if (!cell.isMine()) {
+                if (cell.isFlagged()) {
+                    return false;
+                }
+            }
+        }
+
+        return containsMines;
+    }
+
+    public boolean isCellsAroundRightFlagged(int x, int y) {
+        ArrayList<Cell> neighbouringCells = getNeighbouringCells(x, y);
+
+        return isRightFlagged(neighbouringCells);
+    }
+
+    public void openCellsAround(int x, int y) {
+        ArrayList<Cell> neighbouringCells = getNeighbouringCells(x, y);
+
+        for (Cell cell : neighbouringCells) {
+            if (cell.isClosed()) {
+                cell.open();
+                openedCount++;
+            }
+        }
     }
 }

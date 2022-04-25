@@ -7,9 +7,12 @@ import ru.academit.podlatov.minesweeper.view.secondary_visual_elements.*;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class MainWindow {
@@ -130,7 +133,7 @@ public class MainWindow {
                 int finalX = x;
                 cellButton.addMouseListener(new MouseAdapter() {
                     @Override
-                    public void mousePressed(MouseEvent e) {
+                    public void mouseReleased(MouseEvent e) {
                         super.mouseClicked(e);
 
                         if (cellButton.isEnabled()) {
@@ -164,12 +167,57 @@ public class MainWindow {
                             } else if (!model.isFlag(finalX, finalY) && model.isQuestion(finalX, finalY)) {
                                 model.removeQuestion(finalX, finalY);
                             }
+
                             synchronize();
                         }
                     }
                 });
 
-                buttonsGrid.add(buttons[x][y] = cellButton);
+                cellButton.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (SwingUtilities.isMiddleMouseButton(e)) {
+                            super.mousePressed(e);
+
+                            if(cellButton.isEnabled()){
+                                cellButton.setBorder(new BevelBorder(BevelBorder.LOWERED));
+                            }
+
+                            ArrayList<JButton> buttonsAround = getEnabledButtonsAround(finalX, finalY);
+
+                            for (JButton cellButton : buttonsAround) {
+                                cellButton.setBorder(new BevelBorder(BevelBorder.LOWERED));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        if (SwingUtilities.isMiddleMouseButton(e)) {
+                            super.mouseReleased(e);
+                            cellButton.setBorder(new LineBorder(new Color(128, 128, 128)));
+                            cellButton.setBorderPainted(true);
+
+                            ArrayList<JButton> buttonsAround = getEnabledButtonsAround(finalX, finalY);
+
+                            for (JButton cellButton : buttonsAround) {
+                                cellButton.setBorder(new LineBorder(new Color(128, 128, 128)));
+                                cellButton.setBorderPainted(true);
+                            }
+
+                            if (!cellButton.isEnabled()) {
+                                if (model.isCellsAroundRightFlagged(finalX, finalY)) {
+                                    model.openCellsAround(finalX, finalY);
+                                }
+                            }
+
+                            synchronize();
+                        }
+                    }
+                });
+
+                buttons[x][y] = cellButton;
+                buttonsGrid.add(cellButton);
             }
         }
 
@@ -188,8 +236,14 @@ public class MainWindow {
                     button.setEnabled(false);
 
                     if (cell.getMinesCountAround() > 0) {
-                        button.setIcon(numbersIcons[cell.getMinesCountAround() - 1]);
-                        button.setDisabledIcon(numbersIcons[cell.getMinesCountAround() - 1]);
+                        if (cell.getMinesCountAround() == 9) {
+                            button.setIcon(flagIcon);
+                            button.setDisabledIcon(flagIcon);
+                        } else {
+                            button.setIcon(numbersIcons[cell.getMinesCountAround() - 1]);
+                            button.setDisabledIcon(numbersIcons[cell.getMinesCountAround() - 1]);
+                        }
+
                     }
 
                     if (cell.getMinesCountAround() == 0) {
@@ -216,13 +270,18 @@ public class MainWindow {
         }
     }
 
-    public void showAllField() {
+    private void showAllField() {
         int sideLength = model.getSideLength();
 
         for (int y = 0; y < sideLength; y++) {
             for (int x = 0; x < sideLength; x++) {
                 JButton button = buttons[y][x];
                 Cell cell = model.getCell(y, x);
+                MouseListener[] listeners = button.getMouseListeners();
+
+                for (MouseListener listener : listeners) {
+                    button.removeMouseListener(listener);
+                }
 
                 if (cell.isFlagged()) {
                     if (cell.isMine()) {
@@ -255,5 +314,60 @@ public class MainWindow {
                 }
             }
         }
+    }
+
+    private ArrayList<JButton> getEnabledButtonsAround(int x, int y) {
+        ArrayList<JButton> buttonsAround = new ArrayList<>();
+        int sideLength = buttons.length;
+
+        if (x > 0 && y > 0) {
+            if (buttons[x - 1][y - 1].isEnabled()) {
+                buttonsAround.add(buttons[x - 1][y - 1]);
+            }
+        }
+
+        if (y > 0) {
+            if (buttons[x][y - 1].isEnabled()) {
+                buttonsAround.add(buttons[x][y - 1]);
+            }
+        }
+
+        if (y < sideLength - 1) {
+            if (buttons[x][y + 1].isEnabled()) {
+                buttonsAround.add(buttons[x][y + 1]);
+            }
+        }
+
+        if (x < sideLength - 1 && y > 0) {
+            if (buttons[x + 1][y - 1].isEnabled()) {
+                buttonsAround.add(buttons[x + 1][y - 1]);
+            }
+        }
+
+        if (x > 0) {
+            if (buttons[x - 1][y].isEnabled()) {
+                buttonsAround.add(buttons[x - 1][y]);
+            }
+        }
+
+        if (x < sideLength - 1) {
+            if (buttons[x + 1][y].isEnabled()) {
+                buttonsAround.add(buttons[x + 1][y]);
+            }
+        }
+
+        if (x > 0 && y < sideLength - 1) {
+            if (buttons[x - 1][y + 1].isEnabled()) {
+                buttonsAround.add(buttons[x - 1][y + 1]);
+            }
+        }
+
+        if (x < sideLength - 1 && y < sideLength - 1) {
+            if (buttons[x + 1][y + 1].isEnabled()) {
+                buttonsAround.add(buttons[x + 1][y + 1]);
+            }
+        }
+
+        return buttonsAround;
     }
 }

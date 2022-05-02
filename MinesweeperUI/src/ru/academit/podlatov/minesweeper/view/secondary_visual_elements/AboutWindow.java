@@ -4,31 +4,31 @@ import javax.swing.*;
 import java.awt.*;
 
 public class AboutWindow {
-   private final JDialog jDialog;
+    private final JDialog dialog;
 
     public AboutWindow(JFrame frame) {
-        jDialog = new JDialog(frame, "Minesweeper", true);
+        dialog = new JDialog(frame, "Minesweeper", true);
 
-        JTextArea jTextArea = new JTextArea();
-        jTextArea.setText("This is a simple implementation of the"
+        JTextArea textArea = new JTextArea();
+        textArea.setText("This is a simple implementation of the"
                 + System.lineSeparator()
                 + "minesweeper game."
                 + System.lineSeparator()
                 + "Made using Java Swing.");
-        jTextArea.setEditable(false);
-        jTextArea.setLineWrap(true);
-        jTextArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        jDialog.add(jTextArea);
+        dialog.add(textArea);
         int sideSize = frame.getHeight() / 2;
-        jDialog.setMinimumSize(new Dimension(sideSize, sideSize));
-        jDialog.setBounds(
+        dialog.setMinimumSize(new Dimension(sideSize, sideSize));
+        dialog.setBounds(
                 frame.getX() + frame.getWidth() / 4,
                 frame.getY() + frame.getHeight() / 4,
                 sideSize, sideSize);
     }
 
-    public JDialog getJDialog() {
-        return jDialog;
+    public void show() {
+        dialog.setVisible(true);
     }
 }

@@ -6,13 +6,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SettingsDialogWindow {
-    private final JDialog jDialog;
+    private final JDialog dialog;
 
     public SettingsDialogWindow(JFrame frame, Model model) {
-        jDialog = new JDialog(frame, "settings", true);
+        dialog = new JDialog(frame, "settings", true);
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(2, 2));
-        jDialog.setLayout(new GridLayout(0, 1));
+        dialog.setLayout(new GridLayout(0, 1));
 
         JLabel sideLengthLabel = new JLabel(" Field size: ");
         panel.add(sideLengthLabel);
@@ -25,18 +25,18 @@ public class SettingsDialogWindow {
         panel.add(minesCountField);
 
         panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-        jDialog.add(panel);
+        dialog.add(panel);
 
         JLabel messageLabel = new JLabel(" The settings will be applied at the start of a new game. ");
-        jDialog.add(messageLabel);
+        dialog.add(messageLabel);
         JButton saveButton = new JButton("Save");
-        jDialog.add(saveButton);
+        dialog.add(saveButton);
 
         Dimension dimension = new Dimension(330, 168);
-        jDialog.setBounds(frame.getX() + frame.getWidth() / 4, frame.getY() + frame.getHeight() / 4,
+        dialog.setBounds(frame.getX() + frame.getWidth() / 4, frame.getY() + frame.getHeight() / 4,
                 dimension.width,
                 dimension.height);
-        jDialog.setMinimumSize(dimension);
+        dialog.setMinimumSize(dimension);
 
         saveButton.addActionListener(e -> {
             if (sideLengthField.getText().isEmpty() || minesCountField.getText().isEmpty()) {
@@ -53,7 +53,7 @@ public class SettingsDialogWindow {
                     } else {
                         model.setMinesCount(minesCount);
                         model.setSideLength(sideLength);
-                        jDialog.dispose();
+                        dialog.dispose();
                     }
                 } catch (NumberFormatException exception) {
                     JOptionPane.showMessageDialog(frame, "Not an integer.", "Error", JOptionPane.INFORMATION_MESSAGE);
@@ -62,7 +62,7 @@ public class SettingsDialogWindow {
         });
     }
 
-    public JDialog getJDialog() {
-        return jDialog;
+    public void show() {
+        dialog.setVisible(true);
     }
 }

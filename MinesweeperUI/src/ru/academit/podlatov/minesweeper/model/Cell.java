@@ -1,13 +1,18 @@
 package ru.academit.podlatov.minesweeper.model;
 
 public class Cell {
+    private final int columnNumber;
+    private final int rowNumber;
     private int minesCountAround;
     private boolean isClosed;
     private boolean isMine;
     private boolean isFlagged;
     private boolean isQuestioned;
 
-    public Cell() {
+    public Cell(int columnNumber, int rowNumber) {
+        this.columnNumber = columnNumber;
+        this.rowNumber = rowNumber;
+
         isMine = false;
         isClosed = true;
         isFlagged = false;
@@ -61,5 +66,13 @@ public class Cell {
 
     public void removeQuestion() {
         isQuestioned = false;
+    }
+
+    public int getColumnNumber() {
+        return columnNumber;
+    }
+
+    public int getRowNumber() {
+        return rowNumber;
     }
 }

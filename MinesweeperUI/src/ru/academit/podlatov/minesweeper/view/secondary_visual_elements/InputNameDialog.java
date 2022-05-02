@@ -12,15 +12,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class InputNameDialog {
-    private final JDialog jDialog;
+    private final JDialog dialog;
     private final String inputPrompt = "Enter your name here";
 
     public InputNameDialog(JFrame frame, GameTimer gameTimer) {
-        jDialog = new JDialog(frame, "Congratulations! You win!", true);
+        dialog = new JDialog(frame, "Congratulations! You win!", true);
 
-        jDialog.setLayout(new GridLayout(2, 1));
+        dialog.setLayout(new GridLayout(2, 1));
 
         JTextField nameField = new JTextField(inputPrompt);
         nameField.setHorizontalAlignment(JTextField.CENTER);
@@ -33,18 +34,18 @@ public class InputNameDialog {
             }
         });
 
-        jDialog.add(nameField);
+        dialog.add(nameField);
 
         JButton saveButton = new JButton("Save");
-        jDialog.add(saveButton);
+        dialog.add(saveButton);
 
         Dimension dimension = new Dimension(240, 130);
-        jDialog.setBounds(
+        dialog.setBounds(
                 frame.getX() + frame.getWidth() / 4,
                 frame.getY() + frame.getHeight() / 4,
                 dimension.width,
                 dimension.height);
-        jDialog.setMinimumSize(dimension);
+        dialog.setMinimumSize(dimension);
 
         saveButton.addActionListener(e -> {
             if (nameField.getText().contains(",")) {
@@ -70,13 +71,16 @@ public class InputNameDialog {
                     JOptionPane.showMessageDialog(frame, "The file for writing data is not found.", "Error", JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException e1) {
                     JOptionPane.showMessageDialog(frame, "Writing error.", "Error", JOptionPane.INFORMATION_MESSAGE);
+                } catch (URISyntaxException ex) {
+                    JOptionPane.showMessageDialog(frame, "Failed to get path to write.", "Error", JOptionPane.INFORMATION_MESSAGE);
                 }
-                jDialog.dispose();
+
+                dialog.dispose();
             }
         });
     }
 
-    public JDialog getJDialog() {
-        return jDialog;
+    public void show() {
+        dialog.setVisible(true);
     }
 }

@@ -1,5 +1,6 @@
 package ru.academit.podlatov.minesweeper.model;
 
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -9,7 +10,6 @@ public class Model {
     private final Cell[][] matrix;
 
     private boolean isGameOver;
-    private boolean isWin;
     private int openedCount;
 
     public Model() {
@@ -20,20 +20,19 @@ public class Model {
         this.minesCount = minesCount;
         this.sideLength = sideLength;
         isGameOver = false;
-        isWin = false;
 
         matrix = new Cell[sideLength][sideLength];
 
         for (int i = 0; i < sideLength; i++) {
             for (int j = 0; j < sideLength; j++) {
-                matrix[i][j] = new Cell();
+                matrix[i][j] = new Cell(j, i);
             }
         }
 
         layMines(sideLength);
         countAndSetMinesCountAroundMines(sideLength);
 
-        for (int i = 0; i < sideLength; i++) {
+     /* for (int i = 0; i < sideLength; i++) {
             for (int j = 0; j < sideLength; j++) {
                 if (matrix[i][j].isMine()) {
                     System.out.print("mine   ");
@@ -43,8 +42,7 @@ public class Model {
             }
             System.out.println();
             System.out.println();
-        }
-
+        } */
     }
 
     private void layMines(int sideLength) {
@@ -134,157 +132,11 @@ public class Model {
     }
 
     public boolean isWin() {
-        return isWin;
-    }
+        int foundedMines = countFoundedMines();
 
-    public void openAllZerosAndNeighboringOtherNumbers(ArrayList<Integer> cellsForOpening, ArrayList<Integer> visitedCells) {
-        if (cellsForOpening.isEmpty()) {
-            return;
-        }
-
-        int x = cellsForOpening.get(0) / 100;
-        int y = cellsForOpening.get(0) % 100;
-        Integer lastRemoved = cellsForOpening.remove(0);
-        visitedCells.add(lastRemoved);
-
-        if (x > 0 && y > 0 && matrix[x - 1][y - 1].isClosed()) {
-            if (!matrix[x - 1][y - 1].isFlagged() && !matrix[x - 1][y - 1].isQuestioned()) {
-                matrix[x - 1][y - 1].open();
-                openedCount++;
-            }
-
-            if (matrix[x - 1][y - 1].getMinesCountAround() == 0) {
-                int cellLocation = (x - 1) * 100 + (y - 1);
-
-                if (!cellsForOpening.contains(cellLocation)) {
-                    if (!visitedCells.contains(cellLocation)) {
-                        cellsForOpening.add(cellLocation);
-                    }
-                }
-            }
-        }
-
-        if (y > 0 && matrix[x][y - 1].isClosed()) {
-            if (!matrix[x][y - 1].isFlagged() && !matrix[x][y - 1].isQuestioned()) {
-                matrix[x][y - 1].open();
-                openedCount++;
-            }
-
-            if (matrix[x][y - 1].getMinesCountAround() == 0) {
-                int cellLocation = x * 100 + (y - 1);
-
-                if (!cellsForOpening.contains(cellLocation)) {
-                    if (!visitedCells.contains(cellLocation)) {
-                        cellsForOpening.add(cellLocation);
-                    }
-                }
-            }
-        }
-
-        if (y < sideLength - 1 && matrix[x][y + 1].isClosed()) {
-            if (!matrix[x][y + 1].isFlagged() && !matrix[x][y + 1].isQuestioned()) {
-                matrix[x][y + 1].open();
-                openedCount++;
-            }
-
-            if (matrix[x][y + 1].getMinesCountAround() == 0) {
-                int cellLocation = x * 100 + (y + 1);
-
-                if (!cellsForOpening.contains(cellLocation)) {
-                    if (!visitedCells.contains(cellLocation)) {
-                        cellsForOpening.add(cellLocation);
-                    }
-                }
-            }
-        }
-
-        if (x < sideLength - 1 && y > 0 && matrix[x + 1][y - 1].isClosed()) {
-            if (!matrix[x + 1][y - 1].isFlagged() && !matrix[x + 1][y - 1].isQuestioned()) {
-                matrix[x + 1][y - 1].open();
-                openedCount++;
-            }
-
-            if (matrix[x + 1][y - 1].getMinesCountAround() == 0) {
-                int cellLocation = (x + 1) * 100 + (y - 1);
-
-                if (!cellsForOpening.contains(cellLocation)) {
-                    if (!visitedCells.contains(cellLocation)) {
-                        cellsForOpening.add(cellLocation);
-                    }
-                }
-            }
-        }
-
-        if (x > 0 && matrix[x - 1][y].isClosed()) {
-            if (!matrix[x - 1][y].isFlagged() && !matrix[x - 1][y].isQuestioned()) {
-                matrix[x - 1][y].open();
-                openedCount++;
-            }
-
-            if (matrix[x - 1][y].getMinesCountAround() == 0) {
-                int cellLocation = (x - 1) * 100 + y;
-
-                if (!cellsForOpening.contains(cellLocation)) {
-                    if (!visitedCells.contains(cellLocation)) {
-                        cellsForOpening.add(cellLocation);
-                    }
-                }
-            }
-        }
-
-        if (x < sideLength - 1 && matrix[x + 1][y].isClosed()) {
-            if (!matrix[x + 1][y].isFlagged() && !matrix[x + 1][y].isQuestioned()) {
-                matrix[x + 1][y].open();
-                openedCount++;
-            }
-
-            if (matrix[x + 1][y].getMinesCountAround() == 0) {
-                int cellLocation = (x + 1) * 100 + y;
-
-                if (!cellsForOpening.contains(cellLocation)) {
-                    if (!visitedCells.contains(cellLocation)) {
-                        cellsForOpening.add(cellLocation);
-                    }
-                }
-            }
-        }
-
-        if (x > 0 && y < sideLength - 1 && matrix[x - 1][y + 1].isClosed()) {
-            if (!matrix[x - 1][y + 1].isFlagged() && !matrix[x - 1][y + 1].isQuestioned()) {
-                matrix[x - 1][y + 1].open();
-                openedCount++;
-            }
-
-            if (matrix[x - 1][y + 1].getMinesCountAround() == 0) {
-                int cellLocation = (x - 1) * 100 + (y + 1);
-
-                if (!cellsForOpening.contains(cellLocation)) {
-                    if (!visitedCells.contains(cellLocation)) {
-                        cellsForOpening.add(cellLocation);
-                    }
-                }
-            }
-        }
-
-        if (x < sideLength - 1 && y < sideLength - 1 && matrix[x + 1][y + 1].isClosed()) {
-            if (!matrix[x + 1][y + 1].isFlagged() && !matrix[x + 1][y + 1].isQuestioned()) {
-                matrix[x + 1][y + 1].open();
-                openedCount++;
-            }
-
-            if (matrix[x + 1][y + 1].getMinesCountAround() == 0) {
-                int cellLocation = (x + 1) * 100 + (y + 1);
-
-                if (!cellsForOpening.contains(cellLocation)) {
-                    if (!visitedCells.contains(cellLocation)) {
-                        cellsForOpening.add(cellLocation);
-                    }
-                }
-            }
-        }
-
-        openAllZerosAndNeighboringOtherNumbers(cellsForOpening, visitedCells);
-
+        if (minesCount == foundedMines) {
+            return true;
+        } else return openedCount == sideLength * sideLength - minesCount;
     }
 
     public void openCell(int x, int y) {
@@ -295,24 +147,13 @@ public class Model {
             openedCount++;
 
             if (matrix[x][y].getMinesCountAround() == 0) {
-                ArrayList<Integer> cellsForOpening = new ArrayList<>();
-                cellsForOpening.add(x * 100 + y);
-
-                ArrayList<Integer> visitedCells = new ArrayList<>();
-                openAllZerosAndNeighboringOtherNumbers(cellsForOpening, visitedCells);
-            }
-
-            if (openedCount == sideLength * sideLength - minesCount) {
-                isWin = true;
+                openAllZerosAndNeighboringOtherNumbers(x, y);
             }
         } else {
             matrix[x][y].open();
             openedCount++;
-
-            if (openedCount == sideLength * sideLength - minesCount) {
-                isWin = true;
-            }
         }
+
     }
 
     public void setFlag(int x, int y) {
@@ -342,45 +183,27 @@ public class Model {
     public ArrayList<Cell> getNeighbouringCells(int x, int y) {
         ArrayList<Cell> cells = new ArrayList<>();
 
-        if (x > 0 && y > 0) {
-            cells.add(matrix[x - 1][y - 1]);
-        }
+        for (int i = x - 1; i < x + 2; i++) {
+            for (int j = y - 1; j < y + 2; j++) {
+                if (j < 0 || j >= sideLength || i < 0 || i >= sideLength) {
+                    continue;
+                } else if (i == x && j == y) {
+                    continue;
+                }
 
-        if (y > 0) {
-            cells.add(matrix[x][y - 1]);
-        }
-
-        if (y < sideLength - 1) {
-            cells.add(matrix[x][y + 1]);
-        }
-
-        if (x < sideLength - 1 && y > 0) {
-            cells.add(matrix[x + 1][y - 1]);
-        }
-
-        if (x > 0) {
-            cells.add(matrix[x - 1][y]);
-        }
-
-        if (x < sideLength - 1) {
-            cells.add(matrix[x + 1][y]);
-        }
-
-        if (x > 0 && y < sideLength - 1) {
-            cells.add(matrix[x - 1][y + 1]);
-        }
-
-        if (x < sideLength - 1 && y < sideLength - 1) {
-            cells.add(matrix[x + 1][y + 1]);
+                cells.add(matrix[i][j]);
+            }
         }
 
         return cells;
     }
 
-    public boolean isRightFlagged(ArrayList<Cell> cells) {
+    public boolean isCellsAroundRightFlagged(int x, int y) {
+        ArrayList<Cell> neighbouringCells = getNeighbouringCells(x, y);
+
         boolean containsMines = false;
 
-        for (Cell cell : cells) {
+        for (Cell cell : neighbouringCells) {
             if (cell.isMine()) {
                 containsMines = true;
 
@@ -388,6 +211,7 @@ public class Model {
                     return false;
                 }
             }
+
             if (!cell.isMine()) {
                 if (cell.isFlagged()) {
                     return false;
@@ -398,12 +222,6 @@ public class Model {
         return containsMines;
     }
 
-    public boolean isCellsAroundRightFlagged(int x, int y) {
-        ArrayList<Cell> neighbouringCells = getNeighbouringCells(x, y);
-
-        return isRightFlagged(neighbouringCells);
-    }
-
     public void openCellsAround(int x, int y) {
         ArrayList<Cell> neighbouringCells = getNeighbouringCells(x, y);
 
@@ -411,6 +229,46 @@ public class Model {
             if (cell.isClosed()) {
                 cell.open();
                 openedCount++;
+            }
+        }
+    }
+
+    private int countFoundedMines() {
+        int foundedMines = 0;
+
+        for (int i = 0; i < sideLength; i++) {
+            for (int j = 0; j < sideLength; j++) {
+                if (matrix[i][j].isMine()) {
+                    if (matrix[i][j].isFlagged() || !matrix[i][j].isClosed()) {
+                        foundedMines++;
+                    }
+                }
+            }
+        }
+
+        return foundedMines;
+    }
+
+    public void openAllZerosAndNeighboringOtherNumbers(int x, int y) {
+        ArrayList<Cell> cells = getNeighbouringCells(x, y);
+
+        while (cells.size() > 0) {
+            for (int i = 0; i < cells.size(); i++) {
+                Cell cell = cells.get(i);
+
+                if (cell.isClosed()) {
+                    if (!cell.isFlagged() && !cell.isQuestioned()) {
+                        cell.open();
+                        cells.remove(cell);
+                        openedCount++;
+
+                        if (cell.getMinesCountAround() == 0) {
+                            cells.addAll(getNeighbouringCells(cell.getRowNumber(), cell.getColumnNumber()));
+                        }
+                    }
+                } else {
+                    cells.remove(cell);
+                }
             }
         }
     }

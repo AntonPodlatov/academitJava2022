@@ -9,7 +9,7 @@ public class ScoresLoaderAndWriter {
     private final String filePath;
     private List<ScoreRecord> scoresList = new ArrayList<>();
 
-    public ScoresLoaderAndWriter() throws IOException {
+    public ScoresLoaderAndWriter() throws IOException, URISyntaxException {
         filePath = getPath() + "scoresData.bin";
         File file = new File(filePath);
 
@@ -26,8 +26,6 @@ public class ScoresLoaderAndWriter {
             }
         } catch (ClassNotFoundException | EOFException ignored) {
         }
-
-
     }
 
     public void sortList() {
@@ -42,12 +40,14 @@ public class ScoresLoaderAndWriter {
         return scoresList;
     }
 
-    public void trimToSize10() {
-        if (scoresList.size() < 10) {
+    public void trimList() {
+        final int size = 10;
+
+        if (scoresList.size() < size) {
             return;
         }
 
-        scoresList = scoresList.subList(0, 10);
+        scoresList = scoresList.subList(0, size);
     }
 
     private void replaceAllData() throws IOException {
@@ -65,24 +65,16 @@ public class ScoresLoaderAndWriter {
     public void writeScore(ScoreRecord scoreRecord) throws IOException {
         addToList(scoreRecord);
         sortList();
-        trimToSize10();
+        trimList();
         replaceAllData();
     }
 
-    private String getPath() {
-        String path = null;
-
-        try {
-            path = getClass()
-                    .getProtectionDomain()
-                    .getCodeSource()
-                    .getLocation()
-                    .toURI()
-                    .getPath();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        return path;
+    private String getPath() throws URISyntaxException {
+        return  getClass()
+                .getProtectionDomain()
+                .getCodeSource()
+                .getLocation()
+                .toURI()
+                .getPath();
     }
 }

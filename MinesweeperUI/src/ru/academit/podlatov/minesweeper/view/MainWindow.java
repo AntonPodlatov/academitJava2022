@@ -25,7 +25,6 @@ public class MainWindow {
     private final ImageIcon flagIcon;
     private final ImageIcon questionIcon;
     private final ImageIcon notMineIcon;
-    private final ImageIcon emptyCellIcon;
     private final ImageIcon[] numbersIcons;
 
     public MainWindow(Model model) {
@@ -35,7 +34,6 @@ public class MainWindow {
         notMineIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/notMine.png")));
         flagIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/flag.png")));
         questionIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/question.png")));
-        emptyCellIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/emptyCell.png")));
 
         numbersIcons = new ImageIcon[8];
         numbersIcons[0] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/1.png")));
@@ -71,19 +69,19 @@ public class MainWindow {
             JButton aboutButton = new JButton("About");
             aboutButton.addActionListener(e -> {
                 AboutWindow aboutWindow = new AboutWindow(frame);
-                aboutWindow.getJDialog().setVisible(true);
+                aboutWindow.show();
             });
 
             JButton scoresButton = new JButton("High scores");
             scoresButton.addActionListener(e -> {
                 ScoresWindow scoresWindow = new ScoresWindow(frame);
-                scoresWindow.getJDialog().setVisible(true);
+                scoresWindow.show();
             });
 
             JButton settingsButton = new JButton("Settings");
             settingsButton.addActionListener(e -> {
                 SettingsDialogWindow settingsDialogWindow = new SettingsDialogWindow(frame, model);
-                settingsDialogWindow.getJDialog().setVisible(true);
+                settingsDialogWindow.show();
             });
 
             gameTimer = new GameTimer();
@@ -131,6 +129,7 @@ public class MainWindow {
 
                 int finalY = y;
                 int finalX = x;
+
                 cellButton.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseReleased(MouseEvent e) {
@@ -147,9 +146,10 @@ public class MainWindow {
 
                                 if (model.isWin()) {
                                     gameTimer.stopTimer();
+                                    synchronize();
                                     showAllField();
                                     InputNameDialog inputNameDialog = new InputNameDialog(frame, gameTimer);
-                                    inputNameDialog.getJDialog().setVisible(true);
+                                    inputNameDialog.show();
                                 } else if (model.isGameOver()) {
                                     gameTimer.stopTimer();
                                     showAllField();
@@ -161,14 +161,22 @@ public class MainWindow {
                         } else if (SwingUtilities.isRightMouseButton(e)) {
                             if (!model.isFlag(finalX, finalY) && !model.isQuestion(finalX, finalY)) {
                                 model.setFlag(finalX, finalY);
+                                synchronize();
+
+                                if (model.isWin()) {
+                                    gameTimer.stopTimer();
+                                    showAllField();
+                                    InputNameDialog inputNameDialog = new InputNameDialog(frame, gameTimer);
+                                    inputNameDialog.show();
+                                }
                             } else if (model.isFlag(finalX, finalY) && !model.isQuestion(finalX, finalY)) {
                                 model.removeFlag(finalX, finalY);
                                 model.setQuestion(finalX, finalY);
+                                synchronize();
                             } else if (!model.isFlag(finalX, finalY) && model.isQuestion(finalX, finalY)) {
                                 model.removeQuestion(finalX, finalY);
+                                synchronize();
                             }
-
-                            synchronize();
                         }
                     }
                 });
@@ -179,7 +187,7 @@ public class MainWindow {
                         if (SwingUtilities.isMiddleMouseButton(e)) {
                             super.mousePressed(e);
 
-                            if(cellButton.isEnabled()){
+                            if (cellButton.isEnabled()) {
                                 cellButton.setBorder(new BevelBorder(BevelBorder.LOWERED));
                             }
 
@@ -239,33 +247,39 @@ public class MainWindow {
                         if (cell.getMinesCountAround() == 9) {
                             button.setIcon(flagIcon);
                             button.setDisabledIcon(flagIcon);
+                            button.setBackground(new Color(123, 123, 123));
                         } else {
                             button.setIcon(numbersIcons[cell.getMinesCountAround() - 1]);
                             button.setDisabledIcon(numbersIcons[cell.getMinesCountAround() - 1]);
+                            button.setBackground(new Color(123, 123, 123));
                         }
 
                     }
 
                     if (cell.getMinesCountAround() == 0) {
-                        button.setIcon(emptyCellIcon);
-                        button.setDisabledIcon(emptyCellIcon);
+                        button.setBackground(new Color(123, 123, 123));
                     }
                 } else {
                     if (cell.isFlagged()) {
                         button.setEnabled(false);
                         button.setIcon(flagIcon);
                         button.setDisabledIcon(flagIcon);
+                        button.setBackground(new Color(123, 123, 123));
                     } else if (cell.isQuestioned()) {
                         button.setEnabled(false);
                         button.setIcon(questionIcon);
                         button.setDisabledIcon(questionIcon);
+                        button.setBackground(new Color(123, 123, 123));
                     } else if (!cell.isQuestioned() && !cell.isFlagged()) {
+                        button.setBackground(null);
                         button.setEnabled(true);
                         button.setIcon(null);
                         button.setDisabledIcon(null);
                         button.setText("");
                     }
                 }
+
+
             }
         }
     }
@@ -291,12 +305,15 @@ public class MainWindow {
 
                         button.setIcon(flagIcon);
                         button.setDisabledIcon(flagIcon);
+                        button.setBackground(new Color(123, 123, 123));
 
                         cell.open();
                         button.setEnabled(false);
                     } else {
                         button.setIcon(notMineIcon);
                         button.setDisabledIcon(notMineIcon);
+                        button.setBackground(new Color(123, 123, 123));
+
                     }
                 } else {
                     if (cell.isMine()) {
@@ -306,6 +323,7 @@ public class MainWindow {
 
                         button.setIcon(mineIcon);
                         button.setDisabledIcon(mineIcon);
+                        button.setBackground(new Color(123, 123, 123));
                         cell.open();
                         button.setEnabled(false);
                     }
@@ -317,57 +335,23 @@ public class MainWindow {
     }
 
     private ArrayList<JButton> getEnabledButtonsAround(int x, int y) {
-        ArrayList<JButton> buttonsAround = new ArrayList<>();
+        ArrayList<JButton> cells = new ArrayList<>();
         int sideLength = buttons.length;
 
-        if (x > 0 && y > 0) {
-            if (buttons[x - 1][y - 1].isEnabled()) {
-                buttonsAround.add(buttons[x - 1][y - 1]);
+        for (int i = x - 1; i <= x + 1; i++) {
+            for (int j = y - 1; j <= y + 1; j++) {
+                if (j < 0 || j >= sideLength || i < 0 || i >= sideLength) {
+                    continue;
+                } else if (i == x && j == y) {
+                    continue;
+                }
+
+                if (buttons[i][j].isEnabled()) {
+                    cells.add(buttons[i][j]);
+                }
             }
         }
 
-        if (y > 0) {
-            if (buttons[x][y - 1].isEnabled()) {
-                buttonsAround.add(buttons[x][y - 1]);
-            }
-        }
-
-        if (y < sideLength - 1) {
-            if (buttons[x][y + 1].isEnabled()) {
-                buttonsAround.add(buttons[x][y + 1]);
-            }
-        }
-
-        if (x < sideLength - 1 && y > 0) {
-            if (buttons[x + 1][y - 1].isEnabled()) {
-                buttonsAround.add(buttons[x + 1][y - 1]);
-            }
-        }
-
-        if (x > 0) {
-            if (buttons[x - 1][y].isEnabled()) {
-                buttonsAround.add(buttons[x - 1][y]);
-            }
-        }
-
-        if (x < sideLength - 1) {
-            if (buttons[x + 1][y].isEnabled()) {
-                buttonsAround.add(buttons[x + 1][y]);
-            }
-        }
-
-        if (x > 0 && y < sideLength - 1) {
-            if (buttons[x - 1][y + 1].isEnabled()) {
-                buttonsAround.add(buttons[x - 1][y + 1]);
-            }
-        }
-
-        if (x < sideLength - 1 && y < sideLength - 1) {
-            if (buttons[x + 1][y + 1].isEnabled()) {
-                buttonsAround.add(buttons[x + 1][y + 1]);
-            }
-        }
-
-        return buttonsAround;
+        return cells;
     }
 }

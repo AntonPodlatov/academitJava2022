@@ -66,37 +66,12 @@ public class Model {
                 if (!matrix[x][y].isMine()) {
                     int minesCountAround = 0;
 
-                    if (x > 0 && y > 0 && matrix[x - 1][y - 1].isMine()) {
-                        minesCountAround++;
+                    for (Cell cell : getNeighbouringCells(x, y)) {
+                        if (cell.isMine()) {
+                            minesCountAround++;
+                        }
                     }
 
-                    if (y > 0 && matrix[x][y - 1].isMine()) {
-                        minesCountAround++;
-                    }
-
-                    if (y < sideLength - 1 && matrix[x][y + 1].isMine()) {
-                        minesCountAround++;
-                    }
-
-                    if (x < sideLength - 1 && y > 0 && matrix[x + 1][y - 1].isMine()) {
-                        minesCountAround++;
-                    }
-
-                    if (x > 0 && matrix[x - 1][y].isMine()) {
-                        minesCountAround++;
-                    }
-
-                    if (x < sideLength - 1 && matrix[x + 1][y].isMine()) {
-                        minesCountAround++;
-                    }
-
-                    if (x > 0 && y < sideLength - 1 && matrix[x - 1][y + 1].isMine()) {
-                        minesCountAround++;
-                    }
-
-                    if (x < sideLength - 1 && y < sideLength - 1 && matrix[x + 1][y + 1].isMine()) {
-                        minesCountAround++;
-                    }
                     matrix[x][y].setMinesCountAround(minesCountAround);
                 }
             }

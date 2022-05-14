@@ -14,16 +14,16 @@ import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 public class ScoresWindow {
     private final JDialog dialog;
 
-    public ScoresWindow(JFrame frame) {
-        dialog = new JDialog(frame, "Top 10 scores", true);
+    public ScoresWindow(JFrame frame, int topResultsCount) {
+        dialog = new JDialog(frame, "Top " + topResultsCount + " scores", true);
 
         String[] columns = {"Position", "Name", "Best time"};
-        String[][] data = new String[10][3];
+        String[][] data = new String[topResultsCount][3];
 
         ScoresLoaderAndWriter scoresLoader = null;
 
         try {
-            scoresLoader = new ScoresLoaderAndWriter();
+            scoresLoader = new ScoresLoaderAndWriter(topResultsCount);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(frame, "Data read error.", "Error", JOptionPane.INFORMATION_MESSAGE);
         } catch (URISyntaxException e) {

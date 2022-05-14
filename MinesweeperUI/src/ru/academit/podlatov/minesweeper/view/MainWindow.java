@@ -30,20 +30,29 @@ public class MainWindow {
     public MainWindow(Model model) {
         this.model = model;
 
-        mineIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/mine.png")));
-        notMineIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/notMine.png")));
-        flagIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/flag.png")));
-        questionIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/question.png")));
+        mineIcon = createImageIcon("mine.png");
+        notMineIcon = createImageIcon("notMine.png");
+        flagIcon = createImageIcon("flag.png");
+        questionIcon = createImageIcon("question.png");
 
         numbersIcons = new ImageIcon[8];
-        numbersIcons[0] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/1.png")));
-        numbersIcons[1] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/2.png")));
-        numbersIcons[2] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/3.png")));
-        numbersIcons[3] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/4.png")));
-        numbersIcons[4] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/5.png")));
-        numbersIcons[5] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/6.png")));
-        numbersIcons[6] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/7.png")));
-        numbersIcons[7] = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/8.png")));
+        numbersIcons[0] = createImageIcon("1.png");
+        numbersIcons[1] = createImageIcon("2.png");
+        numbersIcons[2] = createImageIcon("3.png");
+        numbersIcons[3] = createImageIcon("4.png");
+        numbersIcons[4] = createImageIcon("5.png");
+        numbersIcons[5] = createImageIcon("6.png");
+        numbersIcons[6] = createImageIcon("7.png");
+        numbersIcons[7] = createImageIcon("8.png");
+    }
+
+    private ImageIcon createImageIcon(String fileName) {
+        String folderName = "images/";
+        return new ImageIcon(Objects.requireNonNull(getClass().getResource(folderName + fileName)));
+    }
+
+    private String secondsToString(int secondsCount) {
+        return String.format("Game time: %02d:%02d", secondsCount / 60, secondsCount % 60);
     }
 
     public void start() {
@@ -56,15 +65,7 @@ public class MainWindow {
             setFrameSize(frame);
 
             JButton newGameButton = new JButton("New game");
-            newGameButton.addActionListener(e -> {
-                gameTimer.resetTimer();
-                timerLabel.setText(gameTimer.getGameTimeString());
-                model = new Model(model.getMinesCount(), model.getSideLength());
-                frame.remove(buttonsGrid);
-                generateCellGrid(frame);
-                setFrameSize(frame);
-                frame.validate();
-            });
+            newGameButton.addActionListener(e -> newGame(frame));
 
             JButton aboutButton = new JButton("About");
             aboutButton.addActionListener(e -> {
@@ -74,7 +75,7 @@ public class MainWindow {
 
             JButton scoresButton = new JButton("High scores");
             scoresButton.addActionListener(e -> {
-                ScoresWindow scoresWindow = new ScoresWindow(frame);
+                ScoresWindow scoresWindow = new ScoresWindow(frame, model.getTopResultsCount());
                 scoresWindow.show();
             });
 
@@ -87,8 +88,8 @@ public class MainWindow {
             gameTimer = new GameTimer();
             timerLabel = new JLabel();
             timerLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
-            timerLabel.setText(gameTimer.getGameTimeString());
-            gameTimer.addPropertyChangeListener(evt -> timerLabel.setText(gameTimer.getGameTimeString()));
+            timerLabel.setText(secondsToString(gameTimer.getTimerValueInSeconds()));
+            gameTimer.addPropertyChangeListener(evt -> timerLabel.setText(secondsToString(gameTimer.getTimerValueInSeconds())));
 
             JPanel buttonPanel = new JPanel();
             buttonPanel.add(newGameButton);
@@ -104,6 +105,16 @@ public class MainWindow {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setVisible(true);
         });
+    }
+
+    private void newGame(JFrame frame) {
+        gameTimer.resetTimer();
+        timerLabel.setText(secondsToString(gameTimer.getTimerValueInSeconds()));
+        model = new Model(model.getMinesCount(), model.getSideLength());
+        frame.remove(buttonsGrid);
+        generateCellGrid(frame);
+        setFrameSize(frame);
+        frame.validate();
     }
 
     private void setFrameSize(JFrame frame) {
@@ -133,8 +144,6 @@ public class MainWindow {
                 cellButton.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseReleased(MouseEvent e) {
-                        super.mouseClicked(e);
-
                         if (cellButton.isEnabled()) {
                             gameTimer.startTimer();
                         }
@@ -144,11 +153,16 @@ public class MainWindow {
                                 model.openCell(finalX, finalY);
                                 cellButton.setFocusPainted(false);
 
+                                if (model.isExplosionOnFirstOpenedCell()) {
+                                    newGame(frame);
+                                    model.openCell(finalX, finalY);
+                                }
+
                                 if (model.isWin()) {
                                     gameTimer.stopTimer();
                                     synchronize();
                                     showAllField();
-                                    InputNameDialog inputNameDialog = new InputNameDialog(frame, gameTimer);
+                                    InputNameDialog inputNameDialog = new InputNameDialog(frame, gameTimer, model.getTopResultsCount());
                                     inputNameDialog.show();
                                 } else if (model.isGameOver()) {
                                     gameTimer.stopTimer();
@@ -166,7 +180,7 @@ public class MainWindow {
                                 if (model.isWin()) {
                                     gameTimer.stopTimer();
                                     showAllField();
-                                    InputNameDialog inputNameDialog = new InputNameDialog(frame, gameTimer);
+                                    InputNameDialog inputNameDialog = new InputNameDialog(frame, gameTimer, model.getTopResultsCount());
                                     inputNameDialog.show();
                                 }
                             } else if (model.isFlag(finalX, finalY) && !model.isQuestion(finalX, finalY)) {
@@ -185,8 +199,6 @@ public class MainWindow {
                     @Override
                     public void mousePressed(MouseEvent e) {
                         if (SwingUtilities.isMiddleMouseButton(e)) {
-                            super.mousePressed(e);
-
                             if (cellButton.isEnabled()) {
                                 cellButton.setBorder(new BevelBorder(BevelBorder.LOWERED));
                             }
@@ -202,9 +214,10 @@ public class MainWindow {
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         if (SwingUtilities.isMiddleMouseButton(e)) {
-                            super.mouseReleased(e);
-                            cellButton.setBorder(new LineBorder(new Color(128, 128, 128)));
-                            cellButton.setBorderPainted(true);
+                            if (cellButton.isEnabled()) {
+                                cellButton.setBorder(new LineBorder(new Color(128, 128, 128)));
+                                cellButton.setBorderPainted(true);
+                            }
 
                             ArrayList<JButton> buttonsAround = getEnabledButtonsAround(finalX, finalY);
 
@@ -248,6 +261,7 @@ public class MainWindow {
                             button.setIcon(flagIcon);
                             button.setDisabledIcon(flagIcon);
                             button.setBackground(new Color(123, 123, 123));
+                            button.setEnabled(false);
                         } else {
                             button.setIcon(numbersIcons[cell.getMinesCountAround() - 1]);
                             button.setDisabledIcon(numbersIcons[cell.getMinesCountAround() - 1]);
@@ -278,8 +292,6 @@ public class MainWindow {
                         button.setText("");
                     }
                 }
-
-
             }
         }
     }

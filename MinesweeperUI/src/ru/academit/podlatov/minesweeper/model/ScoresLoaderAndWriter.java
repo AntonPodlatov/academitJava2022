@@ -8,8 +8,11 @@ import java.util.List;
 public class ScoresLoaderAndWriter {
     private final String filePath;
     private List<ScoreRecord> scoresList = new ArrayList<>();
+    private final int topResultsCount;
 
-    public ScoresLoaderAndWriter() throws IOException, URISyntaxException {
+    public ScoresLoaderAndWriter(int topResultsCount) throws IOException, URISyntaxException {
+        this.topResultsCount = topResultsCount;
+
         filePath = getPath() + "scoresData.bin";
         File file = new File(filePath);
 
@@ -24,11 +27,10 @@ public class ScoresLoaderAndWriter {
             while ((scoreRecord = (ScoreRecord) objectInputStream.readObject()) != null) {
                 scoresList.add(scoreRecord);
             }
-        } catch (ClassNotFoundException | EOFException ignored) {
-        }
+        } catch (ClassNotFoundException | EOFException ignored) {}
     }
 
-    public void sortList() {
+    private void sortList() {
         scoresList.sort((s1, s2) -> {
             int s1Number = s1.getSecondsCount();
             int s2Number = s2.getSecondsCount();
@@ -40,14 +42,12 @@ public class ScoresLoaderAndWriter {
         return scoresList;
     }
 
-    public void trimList() {
-        final int size = 10;
-
-        if (scoresList.size() < size) {
+    private void trimList() {
+        if (scoresList.size() < topResultsCount) {
             return;
         }
 
-        scoresList = scoresList.subList(0, size);
+        scoresList = scoresList.subList(0, topResultsCount);
     }
 
     private void replaceAllData() throws IOException {
@@ -58,7 +58,7 @@ public class ScoresLoaderAndWriter {
         }
     }
 
-    public void addToList(ScoreRecord scoreRecord) {
+    private void addToList(ScoreRecord scoreRecord) {
         scoresList.add(scoreRecord);
     }
 
@@ -70,7 +70,7 @@ public class ScoresLoaderAndWriter {
     }
 
     private String getPath() throws URISyntaxException {
-        return  getClass()
+        return getClass()
                 .getProtectionDomain()
                 .getCodeSource()
                 .getLocation()

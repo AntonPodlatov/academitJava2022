@@ -8,6 +8,8 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
@@ -18,7 +20,7 @@ public class InputNameDialog {
     private final JDialog dialog;
     private final String inputPrompt = "Enter your name here";
 
-    public InputNameDialog(JFrame frame, GameTimer gameTimer) {
+    public InputNameDialog(JFrame frame, GameTimer gameTimer, int topResultsCount) {
         dialog = new JDialog(frame, "Congratulations! You win!", true);
 
         dialog.setLayout(new GridLayout(2, 1));
@@ -28,9 +30,20 @@ public class InputNameDialog {
         nameField.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                super.mousePressed(e);
                 nameField.setBorder(new BevelBorder(BevelBorder.LOWERED));
                 nameField.setText("");
+            }
+        });
+
+        nameField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                nameField.setBorder(new BevelBorder(BevelBorder.LOWERED));
+                String fieldText = nameField.getText();
+
+                if (fieldText.contains(inputPrompt.substring(0, nameField.getText().length()))) {
+                    nameField.setText(fieldText.substring(nameField.getText().length()));
+                }
             }
         });
 
@@ -50,33 +63,38 @@ public class InputNameDialog {
         saveButton.addActionListener(e -> {
             if (nameField.getText().contains(",")) {
                 JOptionPane.showMessageDialog(frame, "A comma is not allowed here.", "Error", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                String name;
-
-                if (nameField.getText().equals(inputPrompt) || nameField.getText().isEmpty()) {
-                    name = "Anonym";
-                } else {
-                    name = nameField.getText();
-                }
-
-                int score = gameTimer.getTimerValueInSeconds();
-
-                ScoresLoaderAndWriter writer;
-
-                try {
-                    writer = new ScoresLoaderAndWriter();
-                    ScoreRecord scoreRecord = new ScoreRecord(score, name);
-                    writer.writeScore(scoreRecord);
-                } catch (FileNotFoundException e2) {
-                    JOptionPane.showMessageDialog(frame, "The file for writing data is not found.", "Error", JOptionPane.INFORMATION_MESSAGE);
-                } catch (IOException e1) {
-                    JOptionPane.showMessageDialog(frame, "Writing error.", "Error", JOptionPane.INFORMATION_MESSAGE);
-                } catch (URISyntaxException ex) {
-                    JOptionPane.showMessageDialog(frame, "Failed to get path to write.", "Error", JOptionPane.INFORMATION_MESSAGE);
-                }
-
-                dialog.dispose();
+                return;
             }
+
+            String name;
+
+            if (nameField.getText().equals(inputPrompt) || nameField.getText().isEmpty()) {
+                name = "Anonym";
+            } else {
+                name = nameField.getText();
+            }
+
+            int score = gameTimer.getTimerValueInSeconds();
+
+            ScoresLoaderAndWriter writer;
+
+            try {
+                writer = new ScoresLoaderAndWriter(topResultsCount);
+                ScoreRecord scoreRecord = new ScoreRecord(score, name);
+                writer.writeScore(scoreRecord);
+            } catch (FileNotFoundException e2) {
+                JOptionPane.showMessageDialog(frame, "The file for writing data is not found.", "Error", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException e1) {
+                JOptionPane.showMessageDialog(frame, "Writing error.", "Error", JOptionPane.INFORMATION_MESSAGE);
+            } catch (URISyntaxException ex) {
+                JOptionPane.showMessageDialog(frame, "Failed to get path to write.", "Error", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            dialog.dispose();
+
+            ScoresWindow scoresWindow = new ScoresWindow(frame, topResultsCount);
+            scoresWindow.show();
+
         });
     }
 

@@ -9,6 +9,7 @@ public class Model {
     private int sideLength;
     private final Cell[][] matrix;
 
+    private boolean isExplosionOnFirstCell = false;
     private boolean isGameOver;
     private int openedCount;
 
@@ -32,7 +33,7 @@ public class Model {
         layMines(sideLength);
         countAndSetMinesCountAroundMines(sideLength);
 
-     /* for (int i = 0; i < sideLength; i++) {
+/*        for (int i = 0; i < sideLength; i++) {
             for (int j = 0; j < sideLength; j++) {
                 if (matrix[i][j].isMine()) {
                     System.out.print("mine   ");
@@ -42,7 +43,7 @@ public class Model {
             }
             System.out.println();
             System.out.println();
-        } */
+        }*/
     }
 
     private void layMines(int sideLength) {
@@ -116,6 +117,10 @@ public class Model {
 
     public void openCell(int x, int y) {
         if (matrix[x][y].isMine()) {
+            if (openedCount == 0) {
+                isExplosionOnFirstCell = true;
+            }
+
             isGameOver = true;
         } else if (matrix[x][y].getMinesCountAround() == 0 && !matrix[x][y].isFlagged() && !matrix[x][y].isQuestioned()) {
             matrix[x][y].open();
@@ -202,6 +207,10 @@ public class Model {
 
         for (Cell cell : neighbouringCells) {
             if (cell.isClosed()) {
+                if (cell.getMinesCountAround() == 0) {
+                    openAllZerosAndNeighboringOtherNumbers(cell.getRowNumber(), cell.getColumnNumber());
+                }
+
                 cell.open();
                 openedCount++;
             }
@@ -246,5 +255,13 @@ public class Model {
                 }
             }
         }
+    }
+
+    public int getTopResultsCount() {
+        return 10;
+    }
+
+    public boolean isExplosionOnFirstOpenedCell() {
+        return isExplosionOnFirstCell;
     }
 }

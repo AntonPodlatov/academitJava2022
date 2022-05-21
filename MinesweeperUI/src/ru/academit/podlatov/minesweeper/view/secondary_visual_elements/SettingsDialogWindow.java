@@ -9,7 +9,7 @@ public class SettingsDialogWindow {
     private final JDialog dialog;
 
     public SettingsDialogWindow(JFrame frame, Model model) {
-        dialog = new JDialog(frame, "settings", true);
+        dialog = new JDialog(frame, "Settings", true);
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(2, 2));
         dialog.setLayout(new GridLayout(0, 1));
@@ -47,9 +47,10 @@ public class SettingsDialogWindow {
                 try {
                     int minesCount = Integer.parseInt(minesCountField.getText());
                     int sideLength = Integer.parseInt(sideLengthField.getText());
+                    int halfOfMinesCount = sideLength * sideLength / 2;
 
-                    if (minesCount >= sideLength * sideLength / 2) {
-                        JOptionPane.showMessageDialog(frame, "Mines count can't be >= half of all cells on field.", "Error", JOptionPane.INFORMATION_MESSAGE);
+                    if (minesCount >= halfOfMinesCount) {
+                        JOptionPane.showMessageDialog(frame, "Mines count can't be >= "+halfOfMinesCount+" (half of all cells on field).", "Error", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         model.setMinesCount(minesCount);
                         model.setSideLength(sideLength);
